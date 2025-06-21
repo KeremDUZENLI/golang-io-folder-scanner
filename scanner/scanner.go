@@ -7,26 +7,27 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/utils"
 )
 
-var (
-	SuffixesToScan     = []string{".go"}
-	SkipFolders        = []string{"__pycache__", ".venv", ".git", "_scripts"}
-	SkipFoldersContent = []string{"data"}
-)
+func HandleFile(cfg *env.Config, path string, d fs.DirEntry) error {
+	relPath, err := filepath.Rel(cfg.ScanRoot, path)
+	if err != nil {
+		return err
+	}
 
-func HandleFile(path string, d fs.DirEntry) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("\n%s=\n%s\n", path, data)
+
+	fmt.Printf("\n%s=\n%s\n", relPath, data)
 	fmt.Println(strings.Repeat("-", 100))
 	return nil
 }
 
-func Traverse(path string, handle func(string, fs.DirEntry) error) error {
+func Traverse(cfg *env.Config, path string, handle func(*env.Config, string, fs.DirEntry) error) error {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return err
@@ -39,20 +40,20 @@ func Traverse(path string, handle func(string, fs.DirEntry) error) error {
 		fullPath := filepath.Join(path, name)
 
 		if entry.IsDir() {
-			if utils.Contains(SkipFolders, name) || utils.Contains(SkipFoldersContent, name) {
+			if utils.Contains(cfg.SkipFolders, name) || utils.Contains(cfg.SkipFoldersContent, name) {
 				continue
 			}
-			if err := Traverse(fullPath, handle); err != nil {
+			if err := Traverse(cfg, fullPath, handle); err != nil {
 				return err
 			}
 			continue
 		}
 
-		if utils.HasAnySuffix(name, SuffixesToScan) {
-			if utils.Contains(SkipFoldersContent, filepath.Base(filepath.Dir(fullPath))) {
+		if utils.HasAnySuffix(name, cfg.SuffixesToScan) {
+			if utils.Contains(cfg.SkipFoldersContent, filepath.Base(filepath.Dir(fullPath))) {
 				continue
 			}
-			if err := handle(fullPath, entry); err != nil {
+			if err := handle(cfg, fullPath, entry); err != nil {
 				return err
 			}
 		}

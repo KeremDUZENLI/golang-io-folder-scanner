@@ -5,10 +5,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/utils"
 )
 
-func PrintTree(path, prefix string, skipFiles bool) error {
+func PrintTree(cfg *env.Config, path, prefix string, skipFiles bool) error {
 	if prefix == "" {
 		fmt.Println("\nASCII_TREE=")
 	}
@@ -21,7 +22,7 @@ func PrintTree(path, prefix string, skipFiles bool) error {
 
 	var filtered []os.DirEntry
 	for _, e := range entries {
-		if e.IsDir() && utils.Contains(SkipFolders, e.Name()) {
+		if e.IsDir() && utils.Contains(cfg.SkipFolders, e.Name()) {
 			continue
 		}
 		if skipFiles && !e.IsDir() {
@@ -38,8 +39,9 @@ func PrintTree(path, prefix string, skipFiles bool) error {
 			continue
 		}
 
-		nextSkip := skipFiles || utils.Contains(SkipFoldersContent, name)
+		nextSkip := skipFiles || utils.Contains(cfg.SkipFoldersContent, name)
 		if err := PrintTree(
+			cfg,
 			filepath.Join(path, name),
 			prefix+utils.Indent(i, len(filtered)),
 			nextSkip,
