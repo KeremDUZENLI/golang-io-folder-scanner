@@ -27,10 +27,10 @@ func HasAnySuffix(name string, suffixes []string) bool {
 func SortEntries(entries []os.DirEntry) {
 	sort.Slice(entries, func(i, j int) bool {
 		a, b := entries[i], entries[j]
-		if a.IsDir() != b.IsDir() {
-			return a.IsDir()
+		if a.IsDir() == b.IsDir() {
+			return strings.ToLower(a.Name()) < strings.ToLower(b.Name())
 		}
-		return strings.ToLower(a.Name()) < strings.ToLower(b.Name())
+		return a.IsDir()
 	})
 }
 

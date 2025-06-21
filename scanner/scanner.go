@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/utils"
 )
@@ -21,28 +22,41 @@ func HandleFile(path string, d fs.DirEntry) error {
 		return err
 	}
 	fmt.Printf("\n%s=\n%s\n", path, data)
+	fmt.Println(strings.Repeat("-", 100))
 	return nil
 }
 
-func Traverse(root string, handle func(string, fs.DirEntry) error) error {
-	return filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		name := d.Name()
+func Traverse(path string, handle func(string, fs.DirEntry) error) error {
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return err
+	}
 
-		if d.IsDir() {
+	utils.SortEntries(entries)
+
+	for _, entry := range entries {
+		name := entry.Name()
+		fullPath := filepath.Join(path, name)
+
+		if entry.IsDir() {
 			if utils.Contains(SkipFolders, name) || utils.Contains(SkipFoldersContent, name) {
-				return filepath.SkipDir
+				continue
 			}
+			if err := Traverse(fullPath, handle); err != nil {
+				return err
+			}
+			continue
 		}
 
-		if !d.IsDir() && utils.HasAnySuffix(name, SuffixesToScan) {
-			if utils.Contains(SkipFoldersContent, filepath.Base(filepath.Dir(path))) {
-				return nil
+		if utils.HasAnySuffix(name, SuffixesToScan) {
+			if utils.Contains(SkipFoldersContent, filepath.Base(filepath.Dir(fullPath))) {
+				continue
 			}
-			return handle(path, d)
+			if err := handle(fullPath, entry); err != nil {
+				return err
+			}
 		}
-		return nil
-	})
+	}
+
+	return nil
 }

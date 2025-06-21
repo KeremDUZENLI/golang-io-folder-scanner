@@ -9,6 +9,10 @@ import (
 )
 
 func PrintTree(path, prefix string, skipFiles bool) error {
+	if prefix == "" {
+		fmt.Println("\nASCII_TREE=")
+	}
+
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return err
