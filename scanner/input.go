@@ -58,3 +58,8 @@ func GetUserFilters(cfg *env.Config) {
 		cfg.SkipFoldersContent = parts
 	}
 }
+
+func WaitForKeypress() {
+	fmt.Print("\nPress ENTER to exit")
+	fmt.Scanln()
+}

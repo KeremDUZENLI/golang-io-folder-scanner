@@ -21,4 +21,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "tree error: %v\n", err)
 		os.Exit(1)
 	}
+
+	scanner.WaitForKeypress()
 }
