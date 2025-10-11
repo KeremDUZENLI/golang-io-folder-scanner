@@ -1,20 +1,36 @@
 package env
 
-type Config struct {
-	ScanRoot           string
-	SuffixesToScan     []string
-	SkipFolders        []string
-	SkipFoldersContent []string
+type ConfigPath struct {
+	PathToScan string
 }
 
-var DefaultConfig = Config{
+type ConfigScan struct {
+	SuffixesToScan []string
+	FoldersToSkip  []string
+}
+
+type ConfigTree struct {
+	FoldersContentToSkip []string
+}
+
+type Config struct {
+	Path ConfigPath
+	Scan ConfigScan
+	Tree ConfigTree
+}
+
+var DefaultConfigPath = ConfigPath{
+	PathToScan: ".",
+}
+
+var DefaultConfigScan = ConfigScan{
 	SuffixesToScan: []string{
 		".py", ".go",
 		".html", ".css", ".js",
 		".yml", ".json",
 	},
 
-	SkipFolders: []string{
+	FoldersToSkip: []string{
 		"__pycache__",
 		"node_modules",
 		"target",
@@ -22,10 +38,18 @@ var DefaultConfig = Config{
 		".vscode", ".idea", ".out",
 		"dist", "build", "bin", "vendor",
 	},
+}
 
-	SkipFoldersContent: []string{
+var DefaultConfigTree = ConfigTree{
+	FoldersContentToSkip: []string{
 		"data", "img", "images", "assets",
 		"logs", "static",
 		"tmp", "temp",
 	},
+}
+
+var DefaultConfig = Config{
+	Path: DefaultConfigPath,
+	Scan: DefaultConfigScan,
+	Tree: DefaultConfigTree,
 }

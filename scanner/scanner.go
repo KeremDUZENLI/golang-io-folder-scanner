@@ -12,7 +12,7 @@ import (
 )
 
 func HandleFile(cfg *env.Config, path string, d fs.DirEntry) error {
-	relPath, err := filepath.Rel(cfg.ScanRoot, path)
+	relPath, err := filepath.Rel(cfg.Path.PathToScan, path)
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func Traverse(cfg *env.Config, path string, handle func(*env.Config, string, fs.
 		fullPath := filepath.Join(path, name)
 
 		if entry.IsDir() {
-			if utils.Contains(cfg.SkipFolders, name) || utils.Contains(cfg.SkipFoldersContent, name) {
+			if utils.Contains(cfg.Scan.FoldersToSkip, name) || utils.Contains(cfg.Tree.FoldersContentToSkip, name) {
 				continue
 			}
 			if err := Traverse(cfg, fullPath, handle); err != nil {
@@ -49,8 +49,8 @@ func Traverse(cfg *env.Config, path string, handle func(*env.Config, string, fs.
 			continue
 		}
 
-		if utils.HasAnySuffix(name, cfg.SuffixesToScan) {
-			if utils.Contains(cfg.SkipFoldersContent, filepath.Base(filepath.Dir(fullPath))) {
+		if utils.HasAnySuffix(name, cfg.Scan.SuffixesToScan) {
+			if utils.Contains(cfg.Tree.FoldersContentToSkip, filepath.Base(filepath.Dir(fullPath))) {
 				continue
 			}
 			if err := handle(cfg, fullPath, entry); err != nil {

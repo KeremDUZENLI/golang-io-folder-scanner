@@ -10,52 +10,45 @@ import (
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
 )
 
-func GetUserFilters(cfg *env.Config) {
-	reader := bufio.NewReader(os.Stdin)
-	cwd, _ := os.Getwd()
+func ReadInput(reader *bufio.Reader, prompt, defaultConfig string) string {
+	fmt.Printf("%s (default = %s): ", prompt, defaultConfig)
+	input, _ := reader.ReadString('\n')
+	return strings.TrimSpace(input)
+}
 
-	fmt.Printf("Folder Directory: (default = %s): ", cwd)
-	dirLine, _ := reader.ReadString('\n')
-	dir := strings.TrimSpace(dirLine)
+func GetForPath(reader *bufio.Reader) string {
+	cwd, _ := os.Getwd()
+	dir := ReadInput(reader, "Folder Directory", cwd)
+
 	abs_path, err := filepath.Abs(dir)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to resolve: %v\n", err)
 		os.Exit(1)
 	}
-	if stat, err := os.Stat(abs_path); err != nil || !stat.IsDir() {
-		fmt.Fprintf(os.Stderr, "Invalid directory: %v\n", abs_path)
-		os.Exit(1)
-	}
-	cfg.ScanRoot = abs_path
 
-	fmt.Printf("Suffixes To Scan (default = %s): ", strings.Join(cfg.SuffixesToScan, ", "))
-	line, _ := reader.ReadString('\n')
-	if s := strings.TrimSpace(line); s != "" {
-		parts := strings.Split(s, ",")
-		for i := range parts {
-			parts[i] = strings.TrimSpace(parts[i])
-		}
-		cfg.SuffixesToScan = parts
+	return abs_path
+}
+
+func GetForScan(reader *bufio.Reader, cfg *env.Config) {
+	cfg.Path.PathToScan = GetForPath(reader)
+
+	suffixesToScan := ReadInput(reader, "Suffixes To Scan", strings.Join(cfg.Scan.SuffixesToScan, ", "))
+	if suffixesToScan != "" {
+		cfg.Scan.SuffixesToScan = strings.Split(strings.ReplaceAll(suffixesToScan, " ", ""), ",")
 	}
 
-	fmt.Printf("Skip Folders (default = %s): ", strings.Join(cfg.SkipFolders, ", "))
-	line, _ = reader.ReadString('\n')
-	if s := strings.TrimSpace(line); s != "" {
-		parts := strings.Split(s, ",")
-		for i := range parts {
-			parts[i] = strings.TrimSpace(parts[i])
-		}
-		cfg.SkipFolders = parts
+	foldersToSkip := ReadInput(reader, "Skip Folders", strings.Join(cfg.Scan.FoldersToSkip, ", "))
+	if foldersToSkip != "" {
+		cfg.Scan.FoldersToSkip = strings.Split(strings.ReplaceAll(foldersToSkip, " ", ""), ",")
 	}
+}
 
-	fmt.Printf("Skip Folders Content (default = %s): ", strings.Join(cfg.SkipFoldersContent, ", "))
-	line, _ = reader.ReadString('\n')
-	if s := strings.TrimSpace(line); s != "" {
-		parts := strings.Split(s, ",")
-		for i := range parts {
-			parts[i] = strings.TrimSpace(parts[i])
-		}
-		cfg.SkipFoldersContent = parts
+func GetForTree(reader *bufio.Reader, cfg *env.Config) {
+	cfg.Path.PathToScan = GetForPath(reader)
+
+	folderContentToSkip := ReadInput(reader, "Skip Folders Content", strings.Join(cfg.Tree.FoldersContentToSkip, ", "))
+	if folderContentToSkip != "" {
+		cfg.Tree.FoldersContentToSkip = strings.Split(strings.ReplaceAll(folderContentToSkip, " ", ""), ",")
 	}
 }
 

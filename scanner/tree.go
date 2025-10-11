@@ -22,7 +22,7 @@ func PrintTree(cfg *env.Config, path, prefix string, skipFiles bool) error {
 
 	var filtered []os.DirEntry
 	for _, e := range entries {
-		if e.IsDir() && utils.Contains(cfg.SkipFolders, e.Name()) {
+		if e.IsDir() && utils.Contains(cfg.Scan.FoldersToSkip, e.Name()) {
 			continue
 		}
 		if skipFiles && !e.IsDir() {
@@ -39,7 +39,7 @@ func PrintTree(cfg *env.Config, path, prefix string, skipFiles bool) error {
 			continue
 		}
 
-		nextSkip := skipFiles || utils.Contains(cfg.SkipFoldersContent, name)
+		nextSkip := skipFiles || utils.Contains(cfg.Tree.FoldersContentToSkip, name)
 		if err := PrintTree(
 			cfg,
 			filepath.Join(path, name),

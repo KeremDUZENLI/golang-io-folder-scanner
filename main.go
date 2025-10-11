@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 
@@ -10,14 +11,16 @@ import (
 
 func main() {
 	cfg := env.DefaultConfig
-	scanner.GetUserFilters(&cfg)
+	reader := bufio.NewReader(os.Stdin)
 
-	if err := scanner.Traverse(&cfg, cfg.ScanRoot, scanner.HandleFile); err != nil {
+	scanner.GetForScan(reader, &cfg)
+	if err := scanner.Traverse(&cfg, cfg.Path.PathToScan, scanner.HandleFile); err != nil {
 		fmt.Fprintf(os.Stderr, "scan error: %v\n", err)
 		os.Exit(1)
 	}
 
-	if err := scanner.PrintTree(&cfg, cfg.ScanRoot, "", false); err != nil {
+	scanner.GetForTree(reader, &cfg)
+	if err := scanner.PrintTree(&cfg, cfg.Path.PathToScan, "", false); err != nil {
 		fmt.Fprintf(os.Stderr, "tree error: %v\n", err)
 		os.Exit(1)
 	}
