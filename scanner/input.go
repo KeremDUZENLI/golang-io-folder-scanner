@@ -1,58 +1,35 @@
 package scanner
 
 import (
-	"bufio"
-	"fmt"
-	"os"
-	"path/filepath"
-	"strings"
-
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/utils"
 )
 
-func ReadInput(reader *bufio.Reader, prompt, defaultConfig string) string {
-	fmt.Printf("%s (default = %s): ", prompt, defaultConfig)
-	input, _ := reader.ReadString('\n')
-	return strings.TrimSpace(input)
+func GetForPath(cfg *env.Config) {
+	cwd, err := utils.GetCurrentWorkingDirectory()
+	utils.PrintError("Failed to get current working directory", err)
+
+	utils.PrintPrompt("Path To Scan", cwd)
+	directoryToScan := utils.ReadInput(cwd)
+
+	abs_path, err := utils.ResolveAbsolutePath(directoryToScan)
+	utils.PrintError("Failed to resolve", err)
+
+	cfg.Path.PathToScan = abs_path
 }
 
-func GetForPath(reader *bufio.Reader) string {
-	cwd, _ := os.Getwd()
-	dir := ReadInput(reader, "Folder Directory", cwd)
+func GetForScan(cfg *env.Config) {
+	utils.PrintPrompt("Suffixes To Scan", utils.JoinStrings(cfg.Scan.SuffixesToScan))
+	suffixesToScan := utils.ReadInput(utils.JoinStrings(cfg.Scan.SuffixesToScan))
+	cfg.Scan.SuffixesToScan = utils.UpdateListIfInput(suffixesToScan)
 
-	abs_path, err := filepath.Abs(dir)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to resolve: %v\n", err)
-		os.Exit(1)
-	}
-
-	return abs_path
+	utils.PrintPrompt("Skip Folders", utils.JoinStrings(cfg.Scan.FoldersToSkip))
+	foldersToSkip := utils.ReadInput(utils.JoinStrings(cfg.Scan.FoldersToSkip))
+	cfg.Scan.FoldersToSkip = utils.UpdateListIfInput(foldersToSkip)
 }
 
-func GetForScan(reader *bufio.Reader, cfg *env.Config) {
-	cfg.Path.PathToScan = GetForPath(reader)
-
-	suffixesToScan := ReadInput(reader, "Suffixes To Scan", strings.Join(cfg.Scan.SuffixesToScan, ", "))
-	if suffixesToScan != "" {
-		cfg.Scan.SuffixesToScan = strings.Split(strings.ReplaceAll(suffixesToScan, " ", ""), ",")
-	}
-
-	foldersToSkip := ReadInput(reader, "Skip Folders", strings.Join(cfg.Scan.FoldersToSkip, ", "))
-	if foldersToSkip != "" {
-		cfg.Scan.FoldersToSkip = strings.Split(strings.ReplaceAll(foldersToSkip, " ", ""), ",")
-	}
-}
-
-func GetForTree(reader *bufio.Reader, cfg *env.Config) {
-	cfg.Path.PathToScan = GetForPath(reader)
-
-	folderContentToSkip := ReadInput(reader, "Skip Folders Content", strings.Join(cfg.Tree.FoldersContentToSkip, ", "))
-	if folderContentToSkip != "" {
-		cfg.Tree.FoldersContentToSkip = strings.Split(strings.ReplaceAll(folderContentToSkip, " ", ""), ",")
-	}
-}
-
-func WaitForKeypress() {
-	fmt.Print("\nPress ENTER to exit")
-	fmt.Scanln()
+func GetForTree(cfg *env.Config) {
+	utils.PrintPrompt("Skip Folders Content", utils.JoinStrings(cfg.Tree.FoldersContentToSkip))
+	folderContentToSkip := utils.ReadInput(utils.JoinStrings(cfg.Tree.FoldersContentToSkip))
+	cfg.Tree.FoldersContentToSkip = utils.UpdateListIfInput(folderContentToSkip)
 }
