@@ -27,6 +27,41 @@ func HandleFile(cfg *env.Config, path string, d fs.DirEntry) error {
 	return nil
 }
 
+// func Traverse(cfg *env.Config, path string, handle func(*env.Config, string, fs.DirEntry) error) error {
+// 	entries, err := os.ReadDir(path)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	utils.SortEntries(entries)
+
+// 	for _, entry := range entries {
+// 		name := entry.Name()
+// 		fullPath := filepath.Join(path, name)
+
+// 		if entry.IsDir() {
+// 			if utils.Contains(cfg.Scan.FoldersToSkip, name) || utils.Contains(cfg.Tree.FoldersContentToSkip, name) {
+// 				continue
+// 			}
+// 			if err := Traverse(cfg, fullPath, handle); err != nil {
+// 				return err
+// 			}
+// 			continue
+// 		}
+
+// 		if utils.HasAnySuffix(name, cfg.Scan.SuffixesToScan) {
+// 			if utils.Contains(cfg.Tree.FoldersContentToSkip, filepath.Base(filepath.Dir(fullPath))) {
+// 				continue
+// 			}
+// 			if err := handle(cfg, fullPath, entry); err != nil {
+// 				return err
+// 			}
+// 		}
+// 	}
+
+// 	return nil
+// }
+
 func Traverse(cfg *env.Config, path string, handle func(*env.Config, string, fs.DirEntry) error) error {
 	entries, err := os.ReadDir(path)
 	if err != nil {
@@ -40,9 +75,11 @@ func Traverse(cfg *env.Config, path string, handle func(*env.Config, string, fs.
 		fullPath := filepath.Join(path, name)
 
 		if entry.IsDir() {
-			if utils.Contains(cfg.Scan.FoldersToSkip, name) || utils.Contains(cfg.Tree.FoldersContentToSkip, name) {
+			// If this directory is in the "folders to skip" list, skip it entirely.
+			if utils.Contains(cfg.Scan.FoldersToSkip, name) {
 				continue
 			}
+			// Otherwise, recurse into it.
 			if err := Traverse(cfg, fullPath, handle); err != nil {
 				return err
 			}
@@ -50,9 +87,6 @@ func Traverse(cfg *env.Config, path string, handle func(*env.Config, string, fs.
 		}
 
 		if utils.HasAnySuffix(name, cfg.Scan.SuffixesToScan) {
-			if utils.Contains(cfg.Tree.FoldersContentToSkip, filepath.Base(filepath.Dir(fullPath))) {
-				continue
-			}
 			if err := handle(cfg, fullPath, entry); err != nil {
 				return err
 			}

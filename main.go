@@ -11,8 +11,10 @@ func main() {
 
 	scanner.GetForPath(&cfg)
 	scanner.GetForScan(&cfg)
+	scanner.GetForTree(&cfg)
+
 	scanner.Traverse(&cfg, cfg.Path.PathToScan, scanner.HandleFile)
-	scanner.PrintTree(&cfg, cfg.Path.PathToScan, "", false)
+	scanner.PrintTree(&cfg, cfg.Path.PathToScan)
 
 	utils.WaitForKeypress()
 }

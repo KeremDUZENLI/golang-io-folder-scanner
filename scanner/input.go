@@ -1,35 +1,50 @@
 package scanner
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/utils"
 )
 
+func GetCurrentWorkingDirectory() (string, error) {
+	return os.Getwd()
+}
+
+func FormatPathToScan(directoryToScan string) (string, error) {
+	return filepath.Abs(directoryToScan)
+}
+
 func GetForPath(cfg *env.Config) {
-	cwd, err := utils.GetCurrentWorkingDirectory()
-	utils.PrintError("Failed to get current working directory", err)
+	cwd, err := GetCurrentWorkingDirectory()
+	utils.PrintError("Failed to Get Current Working Directory", err)
 
-	utils.PrintPrompt("Path To Scan", cwd)
-	directoryToScan := utils.ReadInput(cwd)
+	input, err := utils.ReadInput("Path To Scan", cwd)
+	utils.PrintError("Failed to Read Path To Scan", err)
 
-	abs_path, err := utils.ResolveAbsolutePath(directoryToScan)
-	utils.PrintError("Failed to resolve", err)
+	pathToScan, err := FormatPathToScan(input)
+	utils.PrintError("Failed to Format Path to Scan", err)
 
-	cfg.Path.PathToScan = abs_path
+	cfg.Path.PathToScan = pathToScan
 }
 
 func GetForScan(cfg *env.Config) {
-	utils.PrintPrompt("Suffixes To Scan", utils.JoinStrings(cfg.Scan.SuffixesToScan))
-	suffixesToScan := utils.ReadInput(utils.JoinStrings(cfg.Scan.SuffixesToScan))
-	cfg.Scan.SuffixesToScan = utils.UpdateListIfInput(suffixesToScan)
+	defaultSuffixesToScan := utils.ListToString(cfg.Scan.SuffixesToScan)
+	input, err := utils.ReadInput("Suffixes to Scan", defaultSuffixesToScan)
+	utils.PrintError("Failed to Read Suffixes to Scan", err)
+	cfg.Scan.SuffixesToScan = utils.StringToList(input)
 
-	utils.PrintPrompt("Skip Folders", utils.JoinStrings(cfg.Scan.FoldersToSkip))
-	foldersToSkip := utils.ReadInput(utils.JoinStrings(cfg.Scan.FoldersToSkip))
-	cfg.Scan.FoldersToSkip = utils.UpdateListIfInput(foldersToSkip)
+	defaultFoldersToSkip := utils.ListToString(cfg.Scan.FoldersToSkip)
+	input, err = utils.ReadInput("Folders to Skip", defaultFoldersToSkip)
+	utils.PrintError("Failed to Read Folders to Skip", err)
+	input = defaultFoldersToSkip + "," + input
+	cfg.Scan.FoldersToSkip = utils.StringToList(input)
 }
 
 func GetForTree(cfg *env.Config) {
-	utils.PrintPrompt("Skip Folders Content", utils.JoinStrings(cfg.Tree.FoldersContentToSkip))
-	folderContentToSkip := utils.ReadInput(utils.JoinStrings(cfg.Tree.FoldersContentToSkip))
-	cfg.Tree.FoldersContentToSkip = utils.UpdateListIfInput(folderContentToSkip)
+	DefaultFoldersContentToSkip := utils.ListToString(cfg.Tree.FoldersContentToSkip)
+	input, err := utils.ReadInput("Folders Content to Skip", DefaultFoldersContentToSkip)
+	utils.PrintError("Failed to Read Folders Content to Skip", err)
+	cfg.Tree.FoldersContentToSkip = utils.StringToList(input)
 }
