@@ -9,12 +9,12 @@ import (
 func main() {
 	cfg := env.DefaultConfig
 
-	scanner.GetForPath(&cfg)
+	utils.GetForPath(&cfg)
 
-	scanner.GetForScan(&cfg)
-	scanner.GetForTree(&cfg)
-
+	utils.GetForScan(&cfg)
 	scanner.PrintScan(&cfg, cfg.Path.PathToScan)
+
+	utils.GetForTree(&cfg)
 	scanner.PrintTree(&cfg, cfg.Path.PathToScan)
 
 	utils.WaitForKeypress()

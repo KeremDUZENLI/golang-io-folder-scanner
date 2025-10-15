@@ -11,13 +11,14 @@ type ConfigPath struct {
 }
 
 type ConfigScan struct {
-	SuffixesToScan  []string
-	FoldersToSkip   []string
-	FolderToSkipAdd []string
+	SuffixesToScan       []string
+	DefaultFoldersToSkip []string
+	FolderToSkip         []string
 }
 
 type ConfigTree struct {
-	FoldersContentToSkip []string
+	DefaultFoldersContentToSkip []string
+	FoldersContentToSkip        []string
 }
 
 var DefaultConfig = Config{
@@ -37,7 +38,7 @@ var DefaultConfigScan = ConfigScan{
 		".yml", ".json",
 	},
 
-	FoldersToSkip: []string{
+	DefaultFoldersToSkip: []string{
 		"__pycache__",
 		"node_modules",
 		"target",
@@ -48,9 +49,7 @@ var DefaultConfigScan = ConfigScan{
 }
 
 var DefaultConfigTree = ConfigTree{
-	FoldersContentToSkip: []string{
-		"data", "img", "images", "assets",
-		"logs", "static",
-		"tmp", "temp",
+	DefaultFoldersContentToSkip: []string{
+		"img", "images",
 	},
 }

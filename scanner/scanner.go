@@ -27,7 +27,7 @@ func printScanRecursive(cfg *env.Config, path string) error {
 		fullPath := filepath.Join(path, name)
 
 		if entry.IsDir() {
-			if utils.Contains(cfg.Scan.FolderToSkipAdd, name) {
+			if utils.Contains(cfg.Scan.FolderToSkip, name) {
 				continue
 			}
 			if err := printScanRecursive(cfg, fullPath); err != nil {

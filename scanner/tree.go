@@ -23,7 +23,7 @@ func printTreeRecursive(cfg *env.Config, path, prefix string, skipFiles bool) er
 
 	var filtered []os.DirEntry
 	for _, e := range entries {
-		if e.IsDir() && utils.Contains(cfg.Scan.FoldersToSkip, e.Name()) {
+		if e.IsDir() && utils.Contains(cfg.Scan.DefaultFoldersToSkip, e.Name()) {
 			continue
 		}
 		if skipFiles && !e.IsDir() {
