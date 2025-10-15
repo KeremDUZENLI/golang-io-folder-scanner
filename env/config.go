@@ -1,22 +1,29 @@
 package env
 
+type Config struct {
+	Path ConfigPath
+	Scan ConfigScan
+	Tree ConfigTree
+}
+
 type ConfigPath struct {
 	PathToScan string
 }
 
 type ConfigScan struct {
-	SuffixesToScan []string
-	FoldersToSkip  []string
+	SuffixesToScan  []string
+	FoldersToSkip   []string
+	FolderToSkipAdd []string
 }
 
 type ConfigTree struct {
 	FoldersContentToSkip []string
 }
 
-type Config struct {
-	Path ConfigPath
-	Scan ConfigScan
-	Tree ConfigTree
+var DefaultConfig = Config{
+	Path: DefaultConfigPath,
+	Scan: DefaultConfigScan,
+	Tree: DefaultConfigTree,
 }
 
 var DefaultConfigPath = ConfigPath{
@@ -46,10 +53,4 @@ var DefaultConfigTree = ConfigTree{
 		"logs", "static",
 		"tmp", "temp",
 	},
-}
-
-var DefaultConfig = Config{
-	Path: DefaultConfigPath,
-	Scan: DefaultConfigScan,
-	Tree: DefaultConfigTree,
 }

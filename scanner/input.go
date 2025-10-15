@@ -39,7 +39,7 @@ func GetForScan(cfg *env.Config) {
 	input, err = utils.ReadInput("Folders to Skip", defaultFoldersToSkip)
 	utils.PrintError("Failed to Read Folders to Skip", err)
 	input = defaultFoldersToSkip + "," + input
-	cfg.Scan.FoldersToSkip = utils.StringToList(input)
+	cfg.Scan.FolderToSkipAdd = utils.StringToList(input)
 }
 
 func GetForTree(cfg *env.Config) {

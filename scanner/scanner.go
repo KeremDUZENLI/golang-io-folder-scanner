@@ -2,7 +2,6 @@ package scanner
 
 import (
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,58 +10,11 @@ import (
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/utils"
 )
 
-func HandleFile(cfg *env.Config, path string, d fs.DirEntry) error {
-	relPath, err := filepath.Rel(cfg.Path.PathToScan, path)
-	if err != nil {
-		return err
-	}
-
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("\n%s=\n%s\n", relPath, data)
-	fmt.Println(strings.Repeat("-", 100))
-	return nil
+func PrintScan(cfg *env.Config, path string) error {
+	return printScanRecursive(cfg, path)
 }
 
-// func Traverse(cfg *env.Config, path string, handle func(*env.Config, string, fs.DirEntry) error) error {
-// 	entries, err := os.ReadDir(path)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	utils.SortEntries(entries)
-
-// 	for _, entry := range entries {
-// 		name := entry.Name()
-// 		fullPath := filepath.Join(path, name)
-
-// 		if entry.IsDir() {
-// 			if utils.Contains(cfg.Scan.FoldersToSkip, name) || utils.Contains(cfg.Tree.FoldersContentToSkip, name) {
-// 				continue
-// 			}
-// 			if err := Traverse(cfg, fullPath, handle); err != nil {
-// 				return err
-// 			}
-// 			continue
-// 		}
-
-// 		if utils.HasAnySuffix(name, cfg.Scan.SuffixesToScan) {
-// 			if utils.Contains(cfg.Tree.FoldersContentToSkip, filepath.Base(filepath.Dir(fullPath))) {
-// 				continue
-// 			}
-// 			if err := handle(cfg, fullPath, entry); err != nil {
-// 				return err
-// 			}
-// 		}
-// 	}
-
-// 	return nil
-// }
-
-func Traverse(cfg *env.Config, path string, handle func(*env.Config, string, fs.DirEntry) error) error {
+func printScanRecursive(cfg *env.Config, path string) error {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return err
@@ -75,21 +27,24 @@ func Traverse(cfg *env.Config, path string, handle func(*env.Config, string, fs.
 		fullPath := filepath.Join(path, name)
 
 		if entry.IsDir() {
-			// If this directory is in the "folders to skip" list, skip it entirely.
-			if utils.Contains(cfg.Scan.FoldersToSkip, name) {
+			if utils.Contains(cfg.Scan.FolderToSkipAdd, name) {
 				continue
 			}
-			// Otherwise, recurse into it.
-			if err := Traverse(cfg, fullPath, handle); err != nil {
+			if err := printScanRecursive(cfg, fullPath); err != nil {
 				return err
 			}
 			continue
 		}
 
 		if utils.HasAnySuffix(name, cfg.Scan.SuffixesToScan) {
-			if err := handle(cfg, fullPath, entry); err != nil {
+			data, err := os.ReadFile(fullPath)
+			if err != nil {
 				return err
 			}
+
+			relPath, _ := filepath.Rel(cfg.Path.PathToScan, fullPath)
+			fmt.Printf("\n%s=\n%s\n", relPath, data)
+			fmt.Println(strings.Repeat("-", 100))
 		}
 	}
 

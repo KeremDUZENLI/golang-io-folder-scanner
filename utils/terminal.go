@@ -7,6 +7,11 @@ import (
 	"strings"
 )
 
+func WaitForKeypress() {
+	fmt.Print("\nPress ENTER to exit")
+	fmt.Scanln()
+}
+
 func PrintError(message string, err error) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %v\n", message, err)
@@ -45,9 +50,4 @@ func StringToList(s string) []string {
 
 func ListToString(list []string) string {
 	return strings.Join(list, ", ")
-}
-
-func WaitForKeypress() {
-	fmt.Print("\nPress ENTER to exit")
-	fmt.Scanln()
 }
