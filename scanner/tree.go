@@ -6,12 +6,11 @@ import (
 	"path/filepath"
 
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
-	"github.com/KeremDUZENLI/golang-io-folder-scanner/utils"
 )
 
-func PrintTree(cfg *env.Config, rootPath string) error {
+func PrintTree(cfg *env.Config, path string) error {
 	fmt.Println("\nASCII_TREE=")
-	return printTreeRecursive(cfg, rootPath, "", false)
+	return printTreeRecursive(cfg, path, "", false)
 }
 
 func printTreeRecursive(cfg *env.Config, path, prefix string, skipFiles bool) error {
@@ -19,11 +18,11 @@ func printTreeRecursive(cfg *env.Config, path, prefix string, skipFiles bool) er
 	if err != nil {
 		return err
 	}
-	utils.SortEntries(entries)
+	sortEntries(entries)
 
 	var filtered []os.DirEntry
 	for _, e := range entries {
-		if e.IsDir() && utils.Contains(cfg.Scan.DefaultFoldersToSkip, e.Name()) {
+		if e.IsDir() && contains(cfg.Scan.DefaultFoldersToSkip, e.Name()) {
 			continue
 		}
 		if skipFiles && !e.IsDir() {
@@ -34,11 +33,11 @@ func printTreeRecursive(cfg *env.Config, path, prefix string, skipFiles bool) er
 
 	for i, e := range filtered {
 		name := e.Name()
-		fmt.Println(prefix + utils.TreeBranch(i, len(filtered)) + name)
+		fmt.Println(prefix + treeBranch(i, len(filtered)) + name)
 
 		if e.IsDir() {
-			nextSkip := skipFiles || utils.Contains(cfg.Tree.FoldersContentToSkip, name)
-			err := printTreeRecursive(cfg, filepath.Join(path, name), prefix+utils.Indent(i, len(filtered)), nextSkip)
+			nextSkip := skipFiles || contains(cfg.Tree.FoldersContentToSkip, name)
+			err := printTreeRecursive(cfg, filepath.Join(path, name), prefix+indent(i, len(filtered)), nextSkip)
 			if err != nil {
 				return err
 			}

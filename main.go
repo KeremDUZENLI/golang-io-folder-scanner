@@ -9,13 +9,17 @@ import (
 func main() {
 	cfg := env.DefaultConfig
 
-	utils.GetForPath(&cfg)
+	cfg.GetForPath()
 
-	utils.GetForScan(&cfg)
-	scanner.PrintScan(&cfg, cfg.Path.PathToScan)
+	// cfg.GetForScan()
+	// scanner.PrintScan(&cfg, cfg.Path.PathToScan)
 
-	utils.GetForTree(&cfg)
-	scanner.PrintTree(&cfg, cfg.Path.PathToScan)
+	// cfg.GetForTree()
+	// scanner.PrintTree(&cfg, cfg.Path.PathToScan)
+
+	cfg.GetForFolders()
+	emptyFolders := scanner.FindEmptyFolders(&cfg, cfg.Path.PathToScan)
+	scanner.PrintEmptyFolders(emptyFolders)
 
 	utils.WaitForKeypress()
 }

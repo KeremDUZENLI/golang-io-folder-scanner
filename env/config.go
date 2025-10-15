@@ -1,9 +1,12 @@
 package env
 
+import "os"
+
 type Config struct {
-	Path ConfigPath
-	Scan ConfigScan
-	Tree ConfigTree
+	Path    ConfigPath
+	Scan    ConfigScan
+	Tree    ConfigTree
+	Folders ConfigFolders
 }
 
 type ConfigPath struct {
@@ -21,14 +24,13 @@ type ConfigTree struct {
 	FoldersContentToSkip        []string
 }
 
-var DefaultConfig = Config{
-	Path: DefaultConfigPath,
-	Scan: DefaultConfigScan,
-	Tree: DefaultConfigTree,
+type ConfigFolders struct {
+	FoldersToScan []os.DirEntry
 }
 
-var DefaultConfigPath = ConfigPath{
-	PathToScan: ".",
+var DefaultConfig = Config{
+	Scan: DefaultConfigScan,
+	Tree: DefaultConfigTree,
 }
 
 var DefaultConfigScan = ConfigScan{
