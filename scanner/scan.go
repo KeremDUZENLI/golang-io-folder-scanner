@@ -1,53 +1,51 @@
 package scanner
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
 )
 
-func PrintScan(path string, cfg *env.Config) error {
-	fmt.Println(strings.Repeat("-", 100))
-	fmt.Println("\nSCANNED_FILES=")
-	return printScanRecursive(path, cfg)
+func ScanFiles(cfg *env.Config) [][2]string {
+	return scanFilesRecursive(cfg.Path.PathToScan, cfg.Path.PathToScan, cfg.Scan.SuffixesToScan, cfg.Scan.FolderToSkip)
 }
 
-func printScanRecursive(path string, cfg *env.Config) error {
-	entries, err := os.ReadDir(path)
+func scanFilesRecursive(path, pathCurrent string, suffixesToScan, foldersToSkip []string) [][2]string {
+	var results [][2]string
+
+	entries, err := os.ReadDir(pathCurrent)
 	if err != nil {
-		return err
+		return results
 	}
 
 	sortEntries(entries)
 
 	for _, entry := range entries {
-		name := entry.Name()
-		fullPath := filepath.Join(path, name)
+		pathFull := filepath.Join(pathCurrent, entry.Name())
 
 		if entry.IsDir() {
-			if contains(cfg.Scan.FolderToSkip, name) {
+			if contain(foldersToSkip, entry.Name()) {
 				continue
 			}
-			if err := printScanRecursive(fullPath, cfg); err != nil {
-				return err
-			}
+			results = append(results, scanFilesRecursive(path, pathFull, suffixesToScan, foldersToSkip)...)
 			continue
 		}
 
-		if hasSuffix(name, cfg.Scan.SuffixesToScan) {
-			data, err := os.ReadFile(fullPath)
+		if hasSuffix(entry.Name(), suffixesToScan) {
+			data, err := os.ReadFile(pathFull)
 			if err != nil {
-				return err
+				continue
 			}
 
-			relPath, _ := filepath.Rel(cfg.Path.PathToScan, fullPath)
-			fmt.Printf("\n%s=\n%s\n", relPath, data)
-			fmt.Println(strings.Repeat("-", 100))
+			pathRel, err := filepath.Rel(path, pathFull)
+			if err != nil {
+				pathRel = pathFull
+			}
+
+			results = append(results, [2]string{pathRel, string(data)})
 		}
 	}
 
-	return nil
+	return results
 }

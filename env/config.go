@@ -3,10 +3,10 @@ package env
 import "os"
 
 type Config struct {
-	Path    ConfigPath
-	Scan    ConfigScan
-	Tree    ConfigTree
-	Folders ConfigFolders
+	Path   ConfigPath
+	Scan   ConfigScan
+	Tree   ConfigTree
+	Folder ConfigFolder
 }
 
 type ConfigPath struct {
@@ -24,7 +24,7 @@ type ConfigTree struct {
 	FoldersContentToSkip        []string
 }
 
-type ConfigFolders struct {
+type ConfigFolder struct {
 	FoldersToScan []os.DirEntry
 }
 

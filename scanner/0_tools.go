@@ -2,31 +2,9 @@ package scanner
 
 import (
 	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 )
-
-func hasFiles(dir string) bool {
-	found := false
-
-	walkDir := func(path string, entry os.DirEntry, err error) error {
-		if err != nil {
-			return nil
-		}
-
-		if !entry.IsDir() {
-			found = true
-			return filepath.SkipDir
-		}
-
-		return nil
-	}
-
-	filepath.WalkDir(dir, walkDir)
-
-	return found
-}
 
 func hasSuffix(name string, suffixes []string) bool {
 	for _, s := range suffixes {
@@ -37,7 +15,7 @@ func hasSuffix(name string, suffixes []string) bool {
 	return false
 }
 
-func contains(list []string, s string) bool {
+func contain(list []string, s string) bool {
 	for _, v := range list {
 		if v == s {
 			return true

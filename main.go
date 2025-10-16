@@ -8,16 +8,20 @@ import (
 
 func main() {
 	cfg := env.DefaultConfig
-	cfg.GetForPath()
 
-	cfg.GetForScan()
-	scanner.PrintScan(cfg.Path.PathToScan, &cfg)
+	cfg.SetForPath()
 
-	cfg.GetForTree()
-	scanner.PrintTree(cfg.Path.PathToScan, &cfg)
+	cfg.SetForScan()
+	scan := scanner.ScanFiles(&cfg)
+	utils.PrintScan(scan)
 
-	cfg.GetForFolders()
-	scanner.PrintEmptyFolders(cfg.Path.PathToScan)
+	cfg.SetForTree()
+	trees := scanner.GetTrees(&cfg)
+	utils.PrintTree(trees)
+
+	cfg.SetForFolders()
+	emptyFolders := scanner.FindEmptyFolders(&cfg)
+	utils.PrintEmptyFolders(emptyFolders)
 
 	utils.WaitForKeypress()
 }

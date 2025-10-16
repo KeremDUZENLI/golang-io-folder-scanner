@@ -12,14 +12,6 @@ func formatPathToScan(directoryToScan string) (string, error) {
 	return filepath.Abs(directoryToScan)
 }
 
-func getCurrentWorkingDirectory() (string, error) {
-	return os.Getwd()
-}
-
-func getFoldersToScan(directoryToScan string) ([]os.DirEntry, error) {
-	return os.ReadDir(directoryToScan)
-}
-
 func stringToList(s string) []string {
 	parts := strings.Split(s, ",")
 	out := make([]string, 0, len(parts))
@@ -51,4 +43,11 @@ func readInput(prompt, defaultVal string) (string, error) {
 	}
 
 	return input, nil
+}
+
+func PrintError(message string, err error) {
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: %v\n", message, err)
+		os.Exit(1)
+	}
 }
