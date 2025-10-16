@@ -11,15 +11,14 @@ func main() {
 
 	cfg.GetForPath()
 
-	// cfg.GetForScan()
-	// scanner.PrintScan(&cfg, cfg.Path.PathToScan)
+	cfg.GetForScan()
+	scanner.PrintScan(cfg.Path.PathToScan, &cfg)
 
-	// cfg.GetForTree()
-	// scanner.PrintTree(&cfg, cfg.Path.PathToScan)
+	cfg.GetForTree()
+	scanner.PrintTree(cfg.Path.PathToScan, &cfg)
 
 	cfg.GetForFolders()
-	emptyFolders := scanner.FindEmptyFolders(&cfg, cfg.Path.PathToScan)
-	scanner.PrintEmptyFolders(emptyFolders)
+	scanner.PrintEmptyFolders(cfg.Path.PathToScan)
 
 	utils.WaitForKeypress()
 }

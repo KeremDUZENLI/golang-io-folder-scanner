@@ -4,16 +4,18 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
 )
 
-func PrintTree(cfg *env.Config, path string) error {
+func PrintTree(path string, cfg *env.Config) error {
+	fmt.Println(strings.Repeat("-", 100))
 	fmt.Println("\nASCII_TREE=")
-	return printTreeRecursive(cfg, path, "", false)
+	return printTreeRecursive(path, cfg, "", false)
 }
 
-func printTreeRecursive(cfg *env.Config, path, prefix string, skipFiles bool) error {
+func printTreeRecursive(path string, cfg *env.Config, prefix string, skipFiles bool) error {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return err
@@ -37,7 +39,7 @@ func printTreeRecursive(cfg *env.Config, path, prefix string, skipFiles bool) er
 
 		if e.IsDir() {
 			nextSkip := skipFiles || contains(cfg.Tree.FoldersContentToSkip, name)
-			err := printTreeRecursive(cfg, filepath.Join(path, name), prefix+indent(i, len(filtered)), nextSkip)
+			err := printTreeRecursive(filepath.Join(path, name), cfg, prefix+indent(i, len(filtered)), nextSkip)
 			if err != nil {
 				return err
 			}

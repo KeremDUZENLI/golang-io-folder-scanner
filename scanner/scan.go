@@ -9,11 +9,13 @@ import (
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
 )
 
-func PrintScan(cfg *env.Config, path string) error {
-	return printScanRecursive(cfg, path)
+func PrintScan(path string, cfg *env.Config) error {
+	fmt.Println(strings.Repeat("-", 100))
+	fmt.Println("\nSCANNED_FILES=")
+	return printScanRecursive(path, cfg)
 }
 
-func printScanRecursive(cfg *env.Config, path string) error {
+func printScanRecursive(path string, cfg *env.Config) error {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return err
@@ -29,7 +31,7 @@ func printScanRecursive(cfg *env.Config, path string) error {
 			if contains(cfg.Scan.FolderToSkip, name) {
 				continue
 			}
-			if err := printScanRecursive(cfg, fullPath); err != nil {
+			if err := printScanRecursive(fullPath, cfg); err != nil {
 				return err
 			}
 			continue

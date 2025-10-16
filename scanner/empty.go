@@ -2,39 +2,51 @@ package scanner
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
-
-	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
+	"strings"
 )
 
-func FindEmptyFolders(cfg *env.Config, path string) []string {
+func PrintEmptyFolders(path string) {
+	fmt.Println(strings.Repeat("-", 100))
+	fmt.Println("\nEMPTY_FOLDERS=")
+
+	emptyFolders := findEmptyFolders(path)
+
+	for _, dir := range emptyFolders {
+		if relPath, err := filepath.Rel(".", dir); err == nil {
+			fmt.Println(strings.TrimPrefix(relPath, `.\`))
+		} else {
+			fmt.Println(dir)
+		}
+	}
+	fmt.Printf("\nTotal Empty Folders: %d\n", len(emptyFolders))
+}
+
+func findEmptyFolders(path string) []string {
 	var emptyFolders []string
 
-	for _, entry := range cfg.Folders.FoldersToScan {
-		if entry.IsDir() {
-			dirPath := filepath.Join(path, entry.Name())
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return emptyFolders
+	}
 
-			if !hasFiles(dirPath) {
-				emptyFolders = append(emptyFolders, dirPath)
-			}
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
 
-			subEmptyFolders := FindEmptyFolders(cfg, dirPath)
-			emptyFolders = append(emptyFolders, subEmptyFolders...)
+		name := entry.Name()
+		pathDir := filepath.Join(path, name)
+		if !hasFiles(pathDir) {
+			emptyFolders = append(emptyFolders, pathDir)
+		}
+
+		emptyFoldersSub := findEmptyFolders(pathDir)
+		if len(emptyFoldersSub) > 0 {
+			emptyFolders = append(emptyFolders, emptyFoldersSub...)
 		}
 	}
 
 	return emptyFolders
-}
-
-func PrintEmptyFolders(emptyFolders []string) {
-	if len(emptyFolders) == 0 {
-		fmt.Println("No empty folders found.")
-		return
-	}
-
-	fmt.Println("Empty folders (would NOT sync in Linux onedrive):")
-	for _, dir := range emptyFolders {
-		fmt.Println(dir)
-	}
-	fmt.Printf("\nTotal empty folders: %d\n", len(emptyFolders))
 }

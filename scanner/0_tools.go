@@ -7,13 +7,25 @@ import (
 	"strings"
 )
 
-func contains(list []string, s string) bool {
-	for _, v := range list {
-		if v == s {
-			return true
+func hasFiles(dir string) bool {
+	found := false
+
+	walkDir := func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return nil
 		}
+
+		if !entry.IsDir() {
+			found = true
+			return filepath.SkipDir
+		}
+
+		return nil
 	}
-	return false
+
+	filepath.WalkDir(dir, walkDir)
+
+	return found
 }
 
 func hasSuffix(name string, suffixes []string) bool {
@@ -25,22 +37,13 @@ func hasSuffix(name string, suffixes []string) bool {
 	return false
 }
 
-func hasFiles(dir string) bool {
-	hasFile := false
-	err := filepath.WalkDir(dir, func(path string, entry os.DirEntry, err error) error {
-
-		if !entry.IsDir() {
-			hasFile = true
-			return filepath.SkipDir
+func contains(list []string, s string) bool {
+	for _, v := range list {
+		if v == s {
+			return true
 		}
-		return nil
-	})
-
-	if err != nil {
-		return true
 	}
-
-	return hasFile
+	return false
 }
 
 func sortEntries(entries []os.DirEntry) {
