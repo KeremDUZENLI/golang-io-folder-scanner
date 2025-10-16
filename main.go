@@ -8,7 +8,6 @@ import (
 
 func main() {
 	cfg := env.DefaultConfig
-
 	cfg.GetForPath()
 
 	cfg.GetForScan()
