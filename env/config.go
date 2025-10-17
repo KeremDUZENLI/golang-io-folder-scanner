@@ -1,46 +1,26 @@
 package env
 
-import "os"
-
 type Config struct {
-	Path   ConfigPath
-	Scan   ConfigScan
-	Tree   ConfigTree
-	Folder ConfigFolder
-}
-
-type ConfigPath struct {
-	PathToScan string
-}
-
-type ConfigScan struct {
+	PathToScan           string
 	SuffixesToScan       []string
-	DefaultFoldersToSkip []string
-	FolderToSkip         []string
+	FoldersToSkip        []string
+	FoldersContentToSkip []string
+	FoldersToScan        []string
 }
 
-type ConfigTree struct {
-	DefaultFoldersContentToSkip []string
-	FoldersContentToSkip        []string
+type ConfigAdd struct {
+	FoldersToSkip        []string
+	FoldersContentToSkip []string
 }
 
-type ConfigFolder struct {
-	FoldersToScan []os.DirEntry
-}
-
-var DefaultConfig = Config{
-	Scan: DefaultConfigScan,
-	Tree: DefaultConfigTree,
-}
-
-var DefaultConfigScan = ConfigScan{
+var ConfigDefault = Config{
+	PathToScan: ".",
 	SuffixesToScan: []string{
 		".py", ".go",
 		".html", ".css", ".js",
 		".yml", ".json",
 	},
-
-	DefaultFoldersToSkip: []string{
+	FoldersToSkip: []string{
 		"__pycache__",
 		"node_modules",
 		"target",
@@ -48,10 +28,8 @@ var DefaultConfigScan = ConfigScan{
 		".vscode", ".idea", ".out",
 		"dist", "build", "bin", "vendor",
 	},
-}
-
-var DefaultConfigTree = ConfigTree{
-	DefaultFoldersContentToSkip: []string{
+	FoldersContentToSkip: []string{
 		"img", "images",
 	},
+	FoldersToScan: []string{},
 }

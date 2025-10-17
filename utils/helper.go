@@ -1,47 +1,29 @@
 package utils
 
 import (
-	"fmt"
 	"path/filepath"
 	"strings"
 )
 
-func PrintScan(results [][2]string) {
-	fmt.Println(strings.Repeat("-", 100))
-	fmt.Println("\nSCANNED_FILES=")
+func formatPathToScan(directoryToScan string) string {
+	absPath, err := filepath.Abs(directoryToScan)
+	PrintError("Failed to Format Path to Scan", err)
 
-	for _, r := range results {
-		fmt.Printf("\n%s=\n%s\n", r[0], r[1])
-		fmt.Println(strings.Repeat("-", 100))
-	}
+	return absPath
 }
 
-func PrintTree(trees []string) {
-	fmt.Println(strings.Repeat("-", 100))
-	fmt.Println("\nASCII_TREE=")
-
-	for _, l := range trees {
-		fmt.Println(l)
-	}
+func listToString(list []string) string {
+	return strings.Join(list, ", ")
 }
 
-func PrintEmptyFolders(emptyFolders []string) {
-	fmt.Println(strings.Repeat("-", 100))
-	fmt.Println("\nEMPTY_FOLDERS=")
-
-	for _, dir := range emptyFolders {
-		normalized := filepath.ToSlash(dir)
-		if relPath, err := filepath.Rel(".", dir); err == nil {
-			normalized = filepath.ToSlash(relPath)
+func stringToList(s string) []string {
+	parts := strings.Split(s, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
 		}
-
-		fmt.Println(normalized)
 	}
-
-	fmt.Printf("\nTotal Empty Folders: %d\n", len(emptyFolders))
-}
-
-func WaitForKeypress() {
-	fmt.Print("\nPress ENTER to exit")
-	fmt.Scanln()
+	return out
 }

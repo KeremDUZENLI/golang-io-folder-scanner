@@ -7,19 +7,27 @@ import (
 )
 
 func main() {
-	cfg := env.DefaultConfig
+	cfg := env.ConfigDefault
+	cfgAdd := env.ConfigAdd{}
 
-	cfg.SetForPath()
+	inputPathToScan := utils.ReadInputPath("[OVERRIDE] Path To Scan", cfg.PathToScan)
+	cfg.PathToScan = inputPathToScan
 
-	cfg.SetForScan()
-	scan := scanner.ScanFiles(&cfg)
+	inputSuffixesToScan := utils.ReadInputList("[OVERRIDE] Suffixes to Scan", cfg.SuffixesToScan)
+	cfg.SuffixesToScan = inputSuffixesToScan
+
+	inputFoldersToSkip := utils.ReadInputList("[ADD] Folders to Skip", cfg.FoldersToSkip)
+	cfgAdd.FoldersToSkip = inputFoldersToSkip
+
+	inputFoldersContentToSkip := utils.ReadInputList("[ADD] Folders Content to Skip", cfg.FoldersContentToSkip)
+	cfgAdd.FoldersContentToSkip = inputFoldersContentToSkip
+
+	scan := scanner.ScanFiles(&cfg, &cfgAdd)
 	utils.PrintScan(scan)
 
-	cfg.SetForTree()
-	trees := scanner.GetTrees(&cfg)
+	trees := scanner.GetTrees(&cfg, &cfgAdd)
 	utils.PrintTree(trees)
 
-	cfg.SetForFolders()
 	emptyFolders := scanner.FindEmptyFolders(&cfg)
 	utils.PrintEmptyFolders(emptyFolders)
 

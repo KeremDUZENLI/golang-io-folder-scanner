@@ -7,11 +7,12 @@ import (
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
 )
 
-func ScanFiles(cfg *env.Config) [][2]string {
-	return scanFilesRecursive(cfg.Path.PathToScan, cfg.Path.PathToScan, cfg.Scan.SuffixesToScan, cfg.Scan.FolderToSkip)
+func ScanFiles(cfg *env.Config, cfgAdd *env.ConfigAdd) [][2]string {
+	foldersToSkipTotal := append(cfg.FoldersToSkip, cfgAdd.FoldersToSkip...)
+	return scanFilesRecursive(cfg.PathToScan, cfg.PathToScan, cfg.SuffixesToScan, foldersToSkipTotal)
 }
 
-func scanFilesRecursive(path, pathCurrent string, suffixesToScan, foldersToSkip []string) [][2]string {
+func scanFilesRecursive(pathToScan, pathCurrent string, suffixesToScan, foldersToSkip []string) [][2]string {
 	var results [][2]string
 
 	entries, err := os.ReadDir(pathCurrent)
@@ -28,7 +29,7 @@ func scanFilesRecursive(path, pathCurrent string, suffixesToScan, foldersToSkip 
 			if contain(foldersToSkip, entry.Name()) {
 				continue
 			}
-			results = append(results, scanFilesRecursive(path, pathFull, suffixesToScan, foldersToSkip)...)
+			results = append(results, scanFilesRecursive(pathToScan, pathFull, suffixesToScan, foldersToSkip)...)
 			continue
 		}
 
@@ -38,7 +39,7 @@ func scanFilesRecursive(path, pathCurrent string, suffixesToScan, foldersToSkip 
 				continue
 			}
 
-			pathRel, err := filepath.Rel(path, pathFull)
+			pathRel, err := filepath.Rel(pathToScan, pathFull)
 			if err != nil {
 				pathRel = pathFull
 			}

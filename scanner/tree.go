@@ -7,21 +7,21 @@ import (
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
 )
 
-func GetTrees(cfg *env.Config) []string {
-	return getTreesRecursive(cfg.Path.PathToScan, cfg.Scan.DefaultFoldersToSkip, cfg.Tree.FoldersContentToSkip, false, "")
+func GetTrees(cfg *env.Config, cfgAdd *env.ConfigAdd) []string {
+	foldersContentToSkipTotal := append(cfg.FoldersContentToSkip, cfgAdd.FoldersContentToSkip...)
+	return getTreesRecursive(cfg.PathToScan, cfg.FoldersToSkip, foldersContentToSkipTotal, false, "")
 }
 
-func getTreesRecursive(path string, defaultFoldersToSkip, foldersContentToSkip []string, skipFiles bool, prefix string) []string {
-	entries, err := os.ReadDir(path)
+func getTreesRecursive(pathToScan string, foldersToSkip, foldersContentToSkip []string, skipFiles bool, prefix string) []string {
+	entries, err := os.ReadDir(pathToScan)
 	if err != nil {
-		env.PrintError("Failed Reading Directory", err)
 		return nil
 	}
 	sortEntries(entries)
 
 	var filtered []os.DirEntry
 	for _, e := range entries {
-		if e.IsDir() && contain(defaultFoldersToSkip, e.Name()) {
+		if e.IsDir() && contain(foldersToSkip, e.Name()) {
 			continue
 		}
 		if skipFiles && !e.IsDir() {
@@ -38,8 +38,8 @@ func getTreesRecursive(path string, defaultFoldersToSkip, foldersContentToSkip [
 
 		if e.IsDir() {
 			nextSkip := skipFiles || contain(foldersContentToSkip, name)
-			childPath := filepath.Join(path, name)
-			childLines := getTreesRecursive(childPath, defaultFoldersToSkip, foldersContentToSkip, nextSkip, prefix+indent(i, len(filtered)))
+			childPath := filepath.Join(pathToScan, name)
+			childLines := getTreesRecursive(childPath, foldersToSkip, foldersContentToSkip, nextSkip, prefix+indent(i, len(filtered)))
 			trees = append(trees, childLines...)
 		}
 	}

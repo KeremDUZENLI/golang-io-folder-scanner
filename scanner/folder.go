@@ -8,8 +8,7 @@ import (
 )
 
 func FindEmptyFolders(cfg *env.Config) []string {
-	foldersToSkip := append(cfg.Scan.DefaultFoldersToSkip, cfg.Scan.FolderToSkip...)
-	return findEmptyFoldersRecursive(cfg.Path.PathToScan, cfg.Path.PathToScan, foldersToSkip)
+	return findEmptyFoldersRecursive(cfg.PathToScan, cfg.PathToScan, cfg.FoldersToSkip)
 }
 
 func findEmptyFoldersRecursive(path, pathCurrent string, defaultFoldersToSkip []string) []string {
