@@ -52,17 +52,33 @@ func sortPathsByBase(paths []string) {
 	})
 }
 
-func hasAnySuffix(name string, suffixes []string) bool {
+func hasSuffix(path string, suffixes []string) bool {
 	if len(suffixes) == 0 {
 		return true
 	}
 
-	name = strings.ToLower(name)
+	pathBase := strings.ToLower(filepath.Base(path))
 	for _, s := range suffixes {
-		if strings.HasSuffix(name, strings.ToLower(s)) {
+		if strings.HasSuffix(pathBase, strings.ToLower(s)) {
 			return true
 		}
 	}
+
+	return false
+}
+
+func skipFolder(path string, foldersToSkip []string) bool {
+	if len(foldersToSkip) == 0 {
+		return false
+	}
+
+	pathBase := strings.ToLower(filepath.Base(path))
+	for _, folderToSkip := range foldersToSkip {
+		if pathBase == strings.ToLower(folderToSkip) {
+			return true
+		}
+	}
+
 	return false
 }
 
