@@ -8,28 +8,41 @@ import (
 
 func main() {
 	cfg := env.ConfigDefault
-	cfgAdd := env.ConfigAdd{}
 
-	inputPathToScan := utils.ReadInputPath("[OVERRIDE] Path To Scan", cfg.PathToScan)
-	cfg.PathToScan = inputPathToScan
+	// override
+	cfg.PathToScan = utils.ReadInputPath("[OVERRIDE] Path To Scan")
+	cfg.SuffixesToScan = utils.ReadInputList("[OVERRIDE] Suffixes to Scan", cfg.SuffixesToScan)
 
-	inputSuffixesToScan := utils.ReadInputList("[OVERRIDE] Suffixes to Scan", cfg.SuffixesToScan)
-	cfg.SuffixesToScan = inputSuffixesToScan
+	// add
+	extraFoldersToSkip := utils.ReadInputList("[ADD] Folders to Skip", cfg.FoldersToSkip)
+	extraFoldersContentToSkip := utils.ReadInputList("[ADD] Folders Content to Skip", cfg.FoldersContentToSkip)
 
-	inputFoldersToSkip := utils.ReadInputList("[ADD] Folders to Skip", cfg.FoldersToSkip)
-	cfgAdd.FoldersToSkip = inputFoldersToSkip
+	// 0) list folders + files (absolute)
+	foldersToSkip := append(cfg.FoldersToSkip, extraFoldersToSkip...)
 
-	inputFoldersContentToSkip := utils.ReadInputList("[ADD] Folders Content to Skip", cfg.FoldersContentToSkip)
-	cfgAdd.FoldersContentToSkip = inputFoldersContentToSkip
+	folders, err := scanner.ListFolders(cfg.PathToScan, foldersToSkip)
+	utils.PrintError("Failed listing folders", err)
 
-	scan := scanner.ScanFiles(&cfg, &cfgAdd)
-	utils.PrintScan(scan)
+	files, err := scanner.ListFiles(cfg.PathToScan, cfg.SuffixesToScan, foldersToSkip)
+	utils.PrintError("Failed listing files", err)
 
-	trees := scanner.GetTrees(&cfg, &cfgAdd)
-	utils.PrintTree(trees)
+	// 1) scan files
+	fileResults, _ := scanner.ReadFiles(files)
+	results := make([][2]string, 0, len(fileResults))
+	for _, fr := range fileResults {
+		results = append(results, [2]string{fr.Path, fr.Content})
+	}
+	utils.PrintScan(results)
 
-	emptyFolders := scanner.FindEmptyFolders(&cfg)
-	utils.PrintEmptyFolders(emptyFolders)
+	// 2) ascii tree
+	foldersContentToSkip := append(cfg.FoldersContentToSkip, extraFoldersContentToSkip...)
+
+	tree := scanner.GetTreesFromLists(cfg.PathToScan, folders, files, foldersContentToSkip)
+	utils.PrintTree(tree)
+
+	// 3) empty folders
+	empty := scanner.FindEmptyFoldersFromLists(cfg.PathToScan, folders, files)
+	utils.PrintEmptyFolders(empty)
 
 	utils.WaitForKeypress()
 }

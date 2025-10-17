@@ -1,47 +1,46 @@
 package scanner
 
-import (
-	"os"
-	"path/filepath"
+import "path/filepath"
 
-	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
-)
+func GetTreesFromLists(path string, folders, files, foldersContentToSkip []string) []string {
+	dirKids := make(map[string][]string)
+	fileKids := make(map[string][]string)
 
-func GetTrees(cfg *env.Config, cfgAdd *env.ConfigAdd) []string {
-	foldersContentToSkipTotal := append(cfg.FoldersContentToSkip, cfgAdd.FoldersContentToSkip...)
-	return getTreesRecursive(cfg.PathToScan, cfg.FoldersToSkip, foldersContentToSkipTotal, false, "")
+	for _, d := range folders {
+		if underPath(path, d) {
+			parent := filepath.Dir(d)
+			dirKids[parent] = append(dirKids[parent], d)
+		}
+	}
+
+	for _, f := range files {
+		if underPath(path, f) {
+			parent := filepath.Dir(f)
+			fileKids[parent] = append(fileKids[parent], f)
+		}
+	}
+
+	for k := range dirKids {
+		sortPathsByBase(dirKids[k])
+	}
+
+	for k := range fileKids {
+		sortPathsByBase(fileKids[k])
+	}
+
+	lines := []string{filepath.Base(path)}
+	return renderTree(path, "", dirKids, fileKids, foldersContentToSkip, lines)
 }
 
-func getTreesRecursive(pathToScan string, foldersToSkip, foldersContentToSkip []string, skipFiles bool, prefix string) []string {
-	entries, err := os.ReadDir(pathToScan)
-	if err != nil {
-		return nil
-	}
-	sortEntries(entries)
-
-	var filtered []os.DirEntry
-	for _, e := range entries {
-		if e.IsDir() && contain(foldersToSkip, e.Name()) {
-			continue
-		}
-		if skipFiles && !e.IsDir() {
-			continue
-		}
-		filtered = append(filtered, e)
-	}
-
-	var trees []string
-	for i, e := range filtered {
-		name := e.Name()
-		line := prefix + treeBranch(i, len(filtered)) + name
-		trees = append(trees, line)
-
-		if e.IsDir() {
-			nextSkip := skipFiles || contain(foldersContentToSkip, name)
-			childPath := filepath.Join(pathToScan, name)
-			childLines := getTreesRecursive(childPath, foldersToSkip, foldersContentToSkip, nextSkip, prefix+indent(i, len(filtered)))
-			trees = append(trees, childLines...)
+func renderTree(parent string, prefix string, dirKids map[string][]string, fileKids map[string][]string, foldersContentToSkip []string, lines []string) []string {
+	entries := listEntries(parent, dirKids, fileKids)
+	for i, e := range entries {
+		lines = append(lines, prefix+treeBranch(i, len(entries))+e.nameBase)
+		if e.isDir && !contains(foldersContentToSkip, e.nameBase) {
+			nextPrefix := prefix + indent(i, len(entries))
+			lines = renderTree(e.pathFull, nextPrefix, dirKids, fileKids, foldersContentToSkip, lines)
 		}
 	}
-	return trees
+
+	return lines
 }

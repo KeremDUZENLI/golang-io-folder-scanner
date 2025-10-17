@@ -8,8 +8,9 @@ import (
 	"strings"
 )
 
-func ReadInputPath(prompt, valueDefault string) string {
-	fmt.Printf("%s (default = %s): ", prompt, valueDefault)
+func ReadInputPath(prompt string) string {
+	cwd, _ := os.Getwd()
+	fmt.Printf("%s (default = %s): ", prompt, cwd)
 
 	reader := bufio.NewReader(os.Stdin)
 	input, err := reader.ReadString('\n')
@@ -17,10 +18,10 @@ func ReadInputPath(prompt, valueDefault string) string {
 
 	input = strings.TrimSpace(input)
 	if input == "" {
-		return valueDefault
+		return absolutePathToScan(cwd)
 	}
 
-	return formatPathToScan(input)
+	return absolutePathToScan(input)
 }
 
 func ReadInputList(prompt string, valueDefault []string) []string {
@@ -48,35 +49,32 @@ func PrintScan(results [][2]string) {
 	}
 }
 
-func PrintTree(trees []string) {
+func PrintTree(lines []string) {
 	fmt.Println(strings.Repeat("-", 100))
 	fmt.Println("\nASCII_TREE=")
 
-	for _, l := range trees {
+	for _, l := range lines {
 		fmt.Println(l)
 	}
 }
 
-func PrintEmptyFolders(emptyFolders []string) {
+func PrintEmptyFolders(list []string) {
 	fmt.Println(strings.Repeat("-", 100))
 	fmt.Println("\nEMPTY_FOLDERS=")
-
-	for _, dir := range emptyFolders {
-		normalized := filepath.ToSlash(dir)
-		if relPath, err := filepath.Rel(".", dir); err == nil {
-			normalized = filepath.ToSlash(relPath)
+	for _, pathTarg := range list {
+		pathRel, err := filepath.Rel(".", pathTarg)
+		if err != nil {
+			pathRel = pathTarg
 		}
-
-		fmt.Println(normalized)
+		fmt.Println(filepath.ToSlash(pathRel))
 	}
 
-	fmt.Printf("\nTotal Empty Folders: %d\n", len(emptyFolders))
+	fmt.Printf("\nTotal Empty Folders: %d\n", len(list))
 }
 
-func PrintError(message string, err error) {
+func PrintError(msg string, err error) {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s: %v\n", message, err)
-		os.Exit(1)
+		fmt.Printf("%s: %v\n", msg, err)
 	}
 }
 

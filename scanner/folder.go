@@ -1,50 +1,46 @@
 package scanner
 
 import (
-	"os"
 	"path/filepath"
-
-	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
+	"strings"
 )
 
-func FindEmptyFolders(cfg *env.Config) []string {
-	return findEmptyFoldersRecursive(cfg.PathToScan, cfg.PathToScan, cfg.FoldersToSkip)
-}
+func FindEmptyFoldersFromLists(path string, folders, files []string) []string {
+	nonEmpty := make(map[string]bool, len(folders))
 
-func findEmptyFoldersRecursive(path, pathCurrent string, defaultFoldersToSkip []string) []string {
-	var emptyFolders []string
-
-	entries, err := os.ReadDir(pathCurrent)
-	if err != nil {
-		return emptyFolders
-	}
-
-	hasFile := false
-	for _, e := range entries {
-		if e.IsDir() {
-			if contain(defaultFoldersToSkip, e.Name()) {
-				continue
+	for _, f := range files {
+		dir := filepath.Dir(f)
+		for {
+			nonEmpty[dir] = true
+			if dir == path {
+				break
 			}
 
-			pathSub := filepath.Join(pathCurrent, e.Name())
-			emptyFoldersSub := findEmptyFoldersRecursive(path, pathSub, defaultFoldersToSkip)
-			emptyFolders = append(emptyFolders, emptyFoldersSub...)
-
-			if !contain(emptyFolders, filepath.ToSlash(pathSub)) {
-				hasFile = true
+			parent := filepath.Dir(dir)
+			if parent == dir {
+				break
 			}
-		} else {
-			hasFile = true
+
+			dir = parent
 		}
 	}
 
-	if !hasFile {
-		relPath, err := filepath.Rel(path, pathCurrent)
+	var empty []string
+	for _, folder := range folders {
+		rel, err := filepath.Rel(path, folder)
+
 		if err != nil {
-			relPath = pathCurrent
+			continue
 		}
-		emptyFolders = append(emptyFolders, filepath.ToSlash(relPath))
+
+		if strings.HasPrefix(rel, "..") {
+			continue
+		}
+
+		if !nonEmpty[folder] {
+			empty = append(empty, folder)
+		}
 	}
 
-	return emptyFolders
+	return empty
 }

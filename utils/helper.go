@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func formatPathToScan(directoryToScan string) string {
+func absolutePathToScan(directoryToScan string) string {
 	absPath, err := filepath.Abs(directoryToScan)
 	PrintError("Failed to Format Path to Scan", err)
 
