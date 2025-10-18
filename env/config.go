@@ -1,18 +1,12 @@
 package env
 
 type Config struct {
-	PathToScan           string
-	SuffixesToScan       []string
-	FoldersToSkip        []string
-	FoldersContentToSkip []string
+	FoldersToSkip     []string
+	SuffixesToScan    []string
+	FoldersTreeToSkip []string
 }
 
 var ConfigDefault = Config{
-	SuffixesToScan: []string{
-		".py", ".go",
-		".html", ".css", ".js",
-		".yml", ".json",
-	},
 	FoldersToSkip: []string{
 		"__pycache__",
 		"node_modules",
@@ -21,7 +15,14 @@ var ConfigDefault = Config{
 		".vscode", ".idea", ".out",
 		"dist", "build", "bin", "vendor",
 	},
-	FoldersContentToSkip: []string{
+
+	SuffixesToScan: []string{
+		".py", ".go",
+		".html", ".css", ".js",
+		".yml", ".json",
+	},
+
+	FoldersTreeToSkip: []string{
 		"img", "images",
 	},
 }

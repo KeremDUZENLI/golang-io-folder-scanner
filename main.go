@@ -3,46 +3,71 @@ package main
 import (
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/scanner"
-	"github.com/KeremDUZENLI/golang-io-folder-scanner/utils"
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/terminal"
 )
 
 func main() {
 	cfg := env.ConfigDefault
 
-	// override
-	cfg.PathToScan = utils.ReadInputPath("[OVERRIDE] Path To Scan")
-	cfg.SuffixesToScan = utils.ReadInputList("[OVERRIDE] Suffixes to Scan", cfg.SuffixesToScan)
+	// 0_
+	pathToScan := terminal.InputPath("[NEW] Path To scan")
 
-	// add
-	extraFoldersToSkip := utils.ReadInputList("[ADD] Folders to Skip", cfg.FoldersToSkip)
-	extraFoldersContentToSkip := utils.ReadInputList("[ADD] Folders Content to Skip", cfg.FoldersContentToSkip)
+	addFoldersToSkip := terminal.InputList("[ADD] Folders to skip", cfg.FoldersToSkip)
+	allfoldersToSkip := append(cfg.FoldersToSkip, addFoldersToSkip...)
 
-	// 0) list folders + files (absolute)
-	foldersToSkip := append(cfg.FoldersToSkip, extraFoldersToSkip...)
+	suffixesToScan := terminal.InputList("[NEW] Suffixes to scan", cfg.SuffixesToScan)
 
-	folders, err := scanner.ListFolders(cfg.PathToScan, foldersToSkip)
-	utils.PrintError("Failed listing folders", err)
+	// 1_list
+	foldersAll, err := scanner.ListFolders(pathToScan)
+	terminal.PrintError("Failed listing foldersAll", err)
 
-	files, err := scanner.ListFiles(cfg.PathToScan, cfg.SuffixesToScan, foldersToSkip)
-	utils.PrintError("Failed listing files", err)
+	// 2_filter
+	foldersFiltered := scanner.FilterFoldersByName(foldersAll, allfoldersToSkip)
 
-	// 1) scan files
-	fileResults, _ := scanner.ReadFiles(files)
-	results := make([][2]string, 0, len(fileResults))
-	for _, fr := range fileResults {
-		results = append(results, [2]string{fr.Path, fr.Content})
+	filesFiltered, err := scanner.FilterFilesBySuffix(foldersFiltered, suffixesToScan)
+	terminal.PrintError("Failed listing filesFiltered", err)
+
+	// 3_content
+	filesPathAndContent, err := scanner.ScanFilesContent(filesFiltered)
+	terminal.PrintError("Failed listing filesPathAndContent", err)
+
+	results := make([][2]string, 0, len(filesPathAndContent))
+	for _, c := range filesPathAndContent {
+		results = append(results, [2]string{c.Path, c.Content})
 	}
-	utils.PrintScan(results)
+	terminal.PrintScan(results)
 
-	// 2) ascii tree
-	foldersContentToSkip := append(cfg.FoldersContentToSkip, extraFoldersContentToSkip...)
+	// 4_tree
+	foldersFiltered2 := scanner.FilterFoldersByName(foldersAll, cfg.FoldersToSkip)
 
-	tree := scanner.GetTreesFromLists(cfg.PathToScan, folders, files, foldersContentToSkip)
-	utils.PrintTree(tree)
+	filesAll, err := scanner.ListFiles(foldersFiltered2)
+	terminal.PrintError("Failed listing filesAll", err)
 
-	// 3) empty folders
-	empty := scanner.FindEmptyFoldersFromLists(cfg.PathToScan, folders, files)
-	utils.PrintEmptyFolders(empty)
+	addFoldersTreeToSkip := terminal.InputList("[ADD] Folders tree to skip", cfg.FoldersTreeToSkip)
+	allFoldersTreeToSkip := append(cfg.FoldersTreeToSkip, addFoldersTreeToSkip...)
 
-	utils.WaitForKeypress()
+	trees := scanner.CreateTree(pathToScan, foldersFiltered2, filesAll, allFoldersTreeToSkip)
+	terminal.PrintTree(trees)
+
+	// 5_find
+	pathToScan2 := terminal.InputPath("[NEW] Path To scan")
+
+	foldersAll2, err := scanner.ListFolders(pathToScan2)
+	terminal.PrintError("Failed listing foldersAll", err)
+
+	foldersEmpty := scanner.FindFoldersEmpty(foldersAll2)
+	terminal.PrintFolders(foldersEmpty)
+
+	// ----------------------
+
+	pathToScan3 := terminal.InputPath("[NEW] Path To scan")
+
+	foldersAll3, err := scanner.ListFolders(pathToScan3)
+	terminal.PrintError("Failed listing foldersAll", err)
+
+	suffixesToScan2 := terminal.InputList("[NEW] Suffixes to scan", cfg.SuffixesToScan)
+	foldersByFileSuffix := scanner.FindFoldersByFileSuffix(foldersAll3, suffixesToScan2)
+	terminal.PrintFolders(foldersByFileSuffix)
+
+	terminal.InputKeypress()
 }
