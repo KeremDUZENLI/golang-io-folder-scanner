@@ -4,20 +4,22 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/scanner"
 )
 
-func PrintScan(results [][2]string) {
-	fmt.Println(strings.Repeat("-", 100))
+func PrintPathContent(files []scanner.PathContent) {
+	printSep()
 	fmt.Println("\nSCANNED_FILES=")
 
-	for _, r := range results {
-		fmt.Printf("\n%s=\n%s\n", r[0], r[1])
-		fmt.Println(strings.Repeat("-", 100))
+	for _, f := range files {
+		fmt.Printf("\n%s=\n%s\n", f.Path, f.Content)
+		printSep()
 	}
 }
 
 func PrintTree(lines []string) {
-	fmt.Println(strings.Repeat("-", 100))
+	printSep()
 	fmt.Println("\nASCII_TREE=")
 
 	for _, l := range lines {
@@ -25,17 +27,16 @@ func PrintTree(lines []string) {
 	}
 }
 
-func PrintFolders(list []string) {
-	fmt.Println(strings.Repeat("-", 100))
+func PrintFolders(root string, list []string) {
+	printSep()
 	fmt.Println("\nFOLDERS=")
-	for _, pathTarg := range list {
-		pathRel, err := filepath.Rel(".", pathTarg)
+	for _, folder := range list {
+		pathRel, err := filepath.Rel(root, folder)
 		if err != nil {
-			pathRel = pathTarg
+			pathRel = folder
 		}
 		fmt.Println(filepath.ToSlash(pathRel))
 	}
-
 	fmt.Printf("\nTotal Folders: %d\n", len(list))
 }
 
@@ -44,3 +45,5 @@ func PrintError(msg string, err error) {
 		fmt.Printf("%s: %v\n", msg, err)
 	}
 }
+
+func printSep() { fmt.Println(strings.Repeat("-", 100)) }

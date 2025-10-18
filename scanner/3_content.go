@@ -2,19 +2,19 @@ package scanner
 
 import "os"
 
-type FileContent struct {
+type PathContent struct {
 	Path    string
 	Content string
 }
 
-func ScanFilesContent(files []string) ([]FileContent, error) {
-	results := make([]FileContent, 0, len(files))
-	for _, p := range files {
-		b, err := os.ReadFile(p)
+func ScanFilesPathContent(files []string) ([]PathContent, error) {
+	fileContentsList := make([]PathContent, 0, len(files))
+	for _, file := range files {
+		bytes, err := os.ReadFile(file)
 		if err != nil {
 			continue
 		}
-		results = append(results, FileContent{Path: p, Content: string(b)})
+		fileContentsList = append(fileContentsList, PathContent{Path: file, Content: string(bytes)})
 	}
-	return results, nil
+	return fileContentsList, nil
 }

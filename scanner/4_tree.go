@@ -48,11 +48,11 @@ func sortPathsByBase(paths []string) {
 }
 
 func renderTree(parent string, prefix string, dirKids map[string][]string, fileKids map[string][]string, foldersContentToSkip []string, lines []string) []string {
-	treeEntryList := listEntries(parent, dirKids, fileKids)
-	for i, e := range treeEntryList {
-		lines = append(lines, prefix+treeBranch(i, len(treeEntryList))+e.nameContent)
+	treeEntriesList := listEntries(parent, dirKids, fileKids)
+	for i, e := range treeEntriesList {
+		lines = append(lines, prefix+treeBranch(i, len(treeEntriesList))+e.nameContent)
 		if e.isDir && !contains(foldersContentToSkip, e.nameContent) {
-			nextPrefix := prefix + indent(i, len(treeEntryList))
+			nextPrefix := prefix + indent(i, len(treeEntriesList))
 			lines = renderTree(e.pathFull, nextPrefix, dirKids, fileKids, foldersContentToSkip, lines)
 		}
 	}
@@ -60,14 +60,14 @@ func renderTree(parent string, prefix string, dirKids map[string][]string, fileK
 }
 
 func listEntries(parent string, dirKids, fileKids map[string][]string) []treeEntry {
-	treeEntryList := make([]treeEntry, 0, len(dirKids[parent])+len(fileKids[parent]))
+	treeEntriesList := make([]treeEntry, 0, len(dirKids[parent])+len(fileKids[parent]))
 	for _, pathFullDir := range dirKids[parent] {
-		treeEntryList = append(treeEntryList, treeEntry{filepath.Base(pathFullDir), pathFullDir, true})
+		treeEntriesList = append(treeEntriesList, treeEntry{filepath.Base(pathFullDir), pathFullDir, true})
 	}
 	for _, pathFullFile := range fileKids[parent] {
-		treeEntryList = append(treeEntryList, treeEntry{filepath.Base(pathFullFile), pathFullFile, false})
+		treeEntriesList = append(treeEntriesList, treeEntry{filepath.Base(pathFullFile), pathFullFile, false})
 	}
-	return treeEntryList
+	return treeEntriesList
 }
 
 func treeBranch(i, total int) string {

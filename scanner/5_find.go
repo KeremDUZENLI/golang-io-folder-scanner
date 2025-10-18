@@ -5,41 +5,48 @@ import (
 	"path/filepath"
 )
 
-func FindFoldersEmpty(folders []string) []string {
+func FindFoldersEmpty(folders []string) ([]string, error) {
 	foldersEmpty := []string{}
-	for _, root := range folders {
-		hasFile := false
-		filepath.WalkDir(root, func(p string, d fs.DirEntry, _ error) error {
-			if d != nil && !d.IsDir() {
-				hasFile = true
-				return filepath.SkipDir
-			}
-			return nil
-		})
+	for _, folder := range folders {
+		hasFile, err := walkFolderHas(folder, func(_ string) bool { return true })
+		if err != nil {
+			return nil, err
+		}
 		if !hasFile {
-			foldersEmpty = append(foldersEmpty, root)
+			foldersEmpty = append(foldersEmpty, folder)
 		}
 	}
-	return foldersEmpty
+	return foldersEmpty, nil
 }
 
-func FindFoldersByFileSuffix(folders, suffixesToFind []string) []string {
+func FindFoldersByFileSuffix(folders []string, suffixesToFind []string) ([]string, error) {
 	foldersByFileSuffix := []string{}
-	for _, root := range folders {
-		found := false
-		filepath.WalkDir(root, func(p string, d fs.DirEntry, _ error) error {
-			if d == nil || d.IsDir() {
-				return nil
-			}
-			if hasSuffix(p, suffixesToFind) {
-				found = true
-				return filepath.SkipDir
-			}
-			return nil
-		})
+	for _, folder := range folders {
+		found, err := walkFolderHas(folder, func(p string) bool { return hasSuffix(p, suffixesToFind) })
+		if err != nil {
+			return nil, err
+		}
 		if found {
-			foldersByFileSuffix = append(foldersByFileSuffix, root)
+			foldersByFileSuffix = append(foldersByFileSuffix, folder)
 		}
 	}
-	return foldersByFileSuffix
+	return foldersByFileSuffix, nil
+}
+
+func walkFolderHas(folder string, match func(filePath string) bool) (bool, error) {
+	found := false
+	err := filepath.WalkDir(folder, func(p string, d fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if d == nil || d.IsDir() {
+			return nil
+		}
+		if match(p) {
+			found = true
+			return filepath.SkipDir
+		}
+		return nil
+	})
+	return found, err
 }

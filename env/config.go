@@ -1,12 +1,14 @@
 package env
 
 type Config struct {
-	FoldersToSkip     []string
+	PathToScan        string
 	SuffixesToScan    []string
+	FoldersToSkip     []string
 	FoldersTreeToSkip []string
 }
 
 var ConfigDefault = Config{
+	PathToScan: ".",
 	FoldersToSkip: []string{
 		"__pycache__",
 		"node_modules",

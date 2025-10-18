@@ -9,14 +9,27 @@ func FilterFoldersByName(folders, foldersToSkip []string) []string {
 	if len(foldersToSkip) == 0 {
 		return folders
 	}
-	out := make([]string, 0, len(folders))
-	for _, f := range folders {
-		if skipFolder(f, foldersToSkip) {
+	filteredFoldersByName := make([]string, 0, len(folders))
+	for _, folder := range folders {
+		if skipFolder(folder, foldersToSkip) {
 			continue
 		}
-		out = append(out, f)
+		filteredFoldersByName = append(filteredFoldersByName, folder)
 	}
-	return out
+	return filteredFoldersByName
+}
+
+func FilterFilesBySuffix(files, suffixesToScan []string) []string {
+	if len(suffixesToScan) == 0 {
+		return files
+	}
+	filteredFilesBySuffix := make([]string, 0, len(files))
+	for _, p := range files {
+		if hasSuffix(p, suffixesToScan) {
+			filteredFilesBySuffix = append(filteredFilesBySuffix, p)
+		}
+	}
+	return filteredFilesBySuffix
 }
 
 func skipFolder(path string, foldersToSkip []string) bool {
@@ -24,42 +37,21 @@ func skipFolder(path string, foldersToSkip []string) bool {
 		return false
 	}
 	base := strings.ToLower(filepath.Base(path))
-	for _, sk := range foldersToSkip {
-		if base == strings.ToLower(sk) {
+	for _, folder := range foldersToSkip {
+		if base == strings.ToLower(folder) {
 			return true
 		}
 	}
 	return false
 }
 
-func FilterFilesBySuffix(foldersFilteredByName, suffixesToScan []string) ([]string, error) {
-	files, err := ListFiles(foldersFilteredByName)
-	if err != nil {
-		return nil, err
-	}
-	return filterBySuffix(files, suffixesToScan), nil
-}
-
-func filterBySuffix(files, suffixesToScan []string) []string {
+func hasSuffix(path string, suffixesToScan []string) bool {
 	if len(suffixesToScan) == 0 {
-		return files
-	}
-	out := make([]string, 0, len(files))
-	for _, p := range files {
-		if hasSuffix(p, suffixesToScan) {
-			out = append(out, p)
-		}
-	}
-	return out
-}
-
-func hasSuffix(path string, suffixes []string) bool {
-	if len(suffixes) == 0 {
 		return true
 	}
 	base := strings.ToLower(filepath.Base(path))
-	for _, s := range suffixes {
-		if strings.HasSuffix(base, strings.ToLower(s)) {
+	for _, suffix := range suffixesToScan {
+		if strings.HasSuffix(base, strings.ToLower(suffix)) {
 			return true
 		}
 	}

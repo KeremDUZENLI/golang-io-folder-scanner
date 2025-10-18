@@ -1,23 +1,32 @@
 package scanner
 
 import (
-	"io/fs"
 	"os"
 	"path/filepath"
 )
 
 func ListFolders(path string) ([]string, error) {
-	folders := []string{}
-	err := filepath.WalkDir(path, func(p string, d fs.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
+	folders := make([]string, 0, 64)
+	stack := []string{path}
+
+	for len(stack) > 0 {
+		dir := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+
+		folders = append(folders, dir)
+
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			continue
 		}
-		if d.IsDir() {
-			folders = append(folders, p)
+		for _, e := range entries {
+			if e.IsDir() {
+				stack = append(stack, filepath.Join(dir, e.Name()))
+			}
 		}
-		return nil
-	})
-	return folders, err
+	}
+
+	return folders, nil
 }
 
 func ListFiles(folders []string) ([]string, error) {
