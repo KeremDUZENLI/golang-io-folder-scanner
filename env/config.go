@@ -9,6 +9,13 @@ type Config struct {
 
 var ConfigDefault = Config{
 	PathToScan: ".",
+
+	SuffixesToScan: []string{
+		".py", ".go",
+		".html", ".css", ".js",
+		".yml", ".json",
+	},
+
 	FoldersToSkip: []string{
 		"__pycache__",
 		"node_modules",
@@ -16,12 +23,6 @@ var ConfigDefault = Config{
 		".git", ".env", ".venv",
 		".vscode", ".idea", ".out",
 		"dist", "build", "bin", "vendor",
-	},
-
-	SuffixesToScan: []string{
-		".py", ".go",
-		".html", ".css", ".js",
-		".yml", ".json",
 	},
 
 	FoldersTreeToSkip: []string{
