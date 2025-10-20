@@ -2,86 +2,66 @@ package scanner
 
 import (
 	"path/filepath"
-	"sort"
-	"strings"
 )
 
 type treeEntry struct {
-	nameContent string
 	pathFull    string
+	contentName string
 	isDir       bool
 }
 
 func CreateTree(root string, folders, files, foldersTreeToSkip []string) []string {
-	dirKids := make(map[string][]string)
-	fileKids := make(map[string][]string)
+	dirKids := make(map[string][]string, len(folders))
+	fileKids := make(map[string][]string, len(files))
 
 	for _, d := range folders {
 		parent := filepath.Dir(d)
 		dirKids[parent] = append(dirKids[parent], d)
 	}
+
 	for _, f := range files {
 		parent := filepath.Dir(f)
 		fileKids[parent] = append(fileKids[parent], f)
-	}
-
-	for k := range dirKids {
-		sortPathsByBase(dirKids[k])
-	}
-	for k := range fileKids {
-		sortPathsByBase(fileKids[k])
 	}
 
 	lines := []string{filepath.Base(root)}
 	return renderTree(root, "", dirKids, fileKids, foldersTreeToSkip, lines)
 }
 
-func sortPathsByBase(paths []string) {
-	sort.Slice(paths, func(i, j int) bool {
-		ib := strings.ToLower(filepath.Base(paths[i]))
-		jb := strings.ToLower(filepath.Base(paths[j]))
-		if ib == jb {
-			return paths[i] < paths[j]
-		}
-		return ib < jb
-	})
-}
+func renderTree(parent, prefix string, dirKids, fileKids map[string][]string, foldersContentToSkip, lines []string) []string {
+	entries := listTreeEntries(parent, dirKids, fileKids)
 
-func renderTree(parent string, prefix string, dirKids map[string][]string, fileKids map[string][]string, foldersContentToSkip []string, lines []string) []string {
-	treeEntriesList := listEntries(parent, dirKids, fileKids)
-	for i, e := range treeEntriesList {
-		lines = append(lines, prefix+treeBranch(i, len(treeEntriesList))+e.nameContent)
-		if e.isDir && !contains(foldersContentToSkip, e.nameContent) {
-			nextPrefix := prefix + indent(i, len(treeEntriesList))
+	for i, e := range entries {
+		lines = append(lines, prefix+treeBranch(i, len(entries))+e.contentName)
+		if e.isDir && !contains(foldersContentToSkip, e.contentName) {
+			nextPrefix := prefix + indent(i, len(entries))
 			lines = renderTree(e.pathFull, nextPrefix, dirKids, fileKids, foldersContentToSkip, lines)
 		}
 	}
+
 	return lines
 }
 
-func listEntries(parent string, dirKids, fileKids map[string][]string) []treeEntry {
-	treeEntriesList := make([]treeEntry, 0, len(dirKids[parent])+len(fileKids[parent]))
-	for _, pathFullDir := range dirKids[parent] {
-		treeEntriesList = append(treeEntriesList, treeEntry{filepath.Base(pathFullDir), pathFullDir, true})
-	}
-	for _, pathFullFile := range fileKids[parent] {
-		treeEntriesList = append(treeEntriesList, treeEntry{filepath.Base(pathFullFile), pathFullFile, false})
-	}
-	return treeEntriesList
-}
+func listTreeEntries(parent string, dirKids, fileKids map[string][]string) []treeEntry {
+	entries := make([]treeEntry, 0, len(dirKids[parent])+len(fileKids[parent]))
 
-func treeBranch(i, total int) string {
-	if i == total-1 {
-		return "└── "
+	for _, d := range dirKids[parent] {
+		entries = append(entries, treeEntry{
+			pathFull:    d,
+			contentName: filepath.Base(d),
+			isDir:       true,
+		})
 	}
-	return "├── "
-}
 
-func indent(i, total int) string {
-	if i == total-1 {
-		return "    "
+	for _, f := range fileKids[parent] {
+		entries = append(entries, treeEntry{
+			pathFull:    f,
+			contentName: filepath.Base(f),
+			isDir:       false,
+		})
 	}
-	return "│   "
+
+	return entries
 }
 
 func contains(list []string, s string) bool {
@@ -90,5 +70,22 @@ func contains(list []string, s string) bool {
 			return true
 		}
 	}
+
 	return false
+}
+
+func treeBranch(i, total int) string {
+	if i == total-1 {
+		return "└── "
+	}
+
+	return "├── "
+}
+
+func indent(i, total int) string {
+	if i == total-1 {
+		return "    "
+	}
+
+	return "│   "
 }

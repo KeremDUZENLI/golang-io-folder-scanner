@@ -5,7 +5,7 @@ import (
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/terminal"
 )
 
-func (c Config) RunFilesPathAndContent() {
+func (c Config) RunFilesContent() {
 	pathToScan := terminal.InputPath("[NEW] Path To scan", c.PathToScan)
 	suffixesToScan := terminal.InputList("[NEW] Suffixes to scan", c.SuffixesToScan)
 	foldersToSkip := terminal.InputList("[ADD] Folders to skip", c.FoldersToSkip)
@@ -20,13 +20,13 @@ func (c Config) RunFilesPathAndContent() {
 	terminal.PrintError("Failed listing filteredFilesByName", err)
 
 	filteredFilesBySuffix := scanner.FilterFilesBySuffix(filteredFilesByName, suffixesToScan)
-	filesPathAndContent, err := scanner.ScanFilesPathContent(filteredFilesBySuffix)
+	filesPathAndContent := scanner.ScanFilesContent(filteredFilesBySuffix)
 	terminal.PrintError("Failed listing filesPathAndContent", err)
 
-	terminal.PrintPathContent(filesPathAndContent)
+	terminal.PrintLines("CONTENT OF FILES", filesPathAndContent)
 }
 
-func (c Config) RunAsciiTree() {
+func (c Config) RunTree() {
 	pathToScan := terminal.InputPath("[NEW] Path To scan", c.PathToScan)
 	foldersTreeToSkip := terminal.InputList("[ADD] Folders tree to skip", c.FoldersTreeToSkip)
 
@@ -41,10 +41,10 @@ func (c Config) RunAsciiTree() {
 
 	tree := scanner.CreateTree(pathToScan, filteredFolders, filteredFiles, allFoldersTreeToSkip)
 
-	terminal.PrintTree(tree)
+	terminal.PrintLines("ASCII TREE", tree)
 }
 
-func (c Config) RunFindFoldersEmpty() {
+func (c Config) RunFoldersEmpty() {
 	pathToScan := terminal.InputPath("[NEW] Path To scan", c.PathToScan)
 
 	foldersAll, err := scanner.ListFolders(pathToScan)
@@ -54,10 +54,10 @@ func (c Config) RunFindFoldersEmpty() {
 	foldersEmpty, err := scanner.FindFoldersEmpty(filteredFolders)
 	terminal.PrintError("Failed listing foldersEmpty", err)
 
-	terminal.PrintFolders(pathToScan, foldersEmpty)
+	terminal.PrintFolders("EMPTY FOLDERS", pathToScan, foldersEmpty)
 }
 
-func (c Config) RunFindFoldersBySuffix() {
+func (c Config) RunFoldersBySuffix() {
 	pathToScan := terminal.InputPath("[NEW] Path To scan", c.PathToScan)
 	suffixesToScan := terminal.InputList("[NEW] Suffixes to scan", c.SuffixesToScan)
 
@@ -68,5 +68,5 @@ func (c Config) RunFindFoldersBySuffix() {
 	foldersByFileSuffix, err := scanner.FindFoldersByFileSuffix(filteredFolders, suffixesToScan)
 	terminal.PrintError("Failed listing folderByFileSuffix", err)
 
-	terminal.PrintFolders(pathToScan, foldersByFileSuffix)
+	terminal.PrintFolders("FOUND FOLDERS", pathToScan, foldersByFileSuffix)
 }

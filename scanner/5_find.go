@@ -16,6 +16,7 @@ func FindFoldersEmpty(folders []string) ([]string, error) {
 			foldersEmpty = append(foldersEmpty, folder)
 		}
 	}
+
 	return foldersEmpty, nil
 }
 
@@ -30,6 +31,7 @@ func FindFoldersByFileSuffix(folders []string, suffixesToFind []string) ([]strin
 			foldersByFileSuffix = append(foldersByFileSuffix, folder)
 		}
 	}
+
 	return foldersByFileSuffix, nil
 }
 
@@ -48,5 +50,6 @@ func walkFolderHas(folder string, match func(filePath string) bool) (bool, error
 		}
 		return nil
 	})
+
 	return found, err
 }

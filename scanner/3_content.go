@@ -1,20 +1,39 @@
 package scanner
 
-import "os"
+import (
+	"fmt"
+	"os"
+	"strings"
+)
 
-type PathContent struct {
-	Path    string
-	Content string
+type pathAndContent struct {
+	path    string
+	content string
 }
 
-func ScanFilesPathContent(files []string) ([]PathContent, error) {
-	fileContentsList := make([]PathContent, 0, len(files))
+func ScanFilesContent(files []string) []string {
+	pathAndContents := make([]pathAndContent, 0, len(files))
+
 	for _, file := range files {
 		bytes, err := os.ReadFile(file)
 		if err != nil {
 			continue
 		}
-		fileContentsList = append(fileContentsList, PathContent{Path: file, Content: string(bytes)})
+		pathAndContents = append(pathAndContents, pathAndContent{file, string(bytes)})
 	}
-	return fileContentsList, nil
+
+	lines := listPathAndContents(pathAndContents)
+	return lines
+}
+
+func listPathAndContents(pathAndContents []pathAndContent) []string {
+	lines := make([]string, 0, len(pathAndContents)*2)
+
+	for _, pc := range pathAndContents {
+		lines = append(lines, fmt.Sprintf("%s=", pc.path))
+		lines = append(lines, pc.content)
+		lines = append(lines, strings.Repeat("-", 100))
+	}
+
+	return lines
 }

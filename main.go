@@ -10,8 +10,8 @@ func main() {
 	cfg := env.ConfigDefault
 	cfg.PathToScan, _ = os.Getwd()
 
-	cfg.RunFilesPathAndContent()
-	// cfg.RunAsciiTree()
-	// cfg.RunFindFoldersEmpty()
-	// cfg.RunFindFoldersBySuffix()
+	cfg.RunFilesContent()
+	cfg.RunTree()
+	cfg.RunFoldersEmpty()
+	cfg.RunFoldersBySuffix()
 }
