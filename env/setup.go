@@ -5,96 +5,71 @@ import (
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/terminal"
 )
 
-func (c Config) RunFilesContent() {
-	pathToScan := terminal.InputPath("[NEW] Path To scan", c.PathToScan)
-	suffixesToScan := terminal.InputList("[NEW] Suffixes to scan", c.SuffixesToScan)
-	foldersToSkip := terminal.InputList("[ADD] Folders to skip", c.FoldersToSkip)
+func (c config) RunPath() []string {
+	c.PathToScan = terminal.InputPath("[NEW] Path To scan", c.PathToScan)
+	return scanner.ListFolders(c.PathToScan)
+}
 
+func (c config) RunScanFilesContent(folders []string) {
+	foldersToSkip := terminal.InputList("[ADD] Folders to skip", c.FoldersToSkip)
 	allfoldersToSkip := append(c.FoldersToSkip, foldersToSkip...)
 
-	foldersAll, err := scanner.ListFolders(pathToScan)
-	terminal.PrintError("Failed listing foldersAll", err)
+	filteredFoldersByName := scanner.FilterFoldersByName(folders, allfoldersToSkip)
+	filteredFilesByName := scanner.ListFiles(filteredFoldersByName)
 
-	filteredFoldersByName := scanner.FilterFoldersByName(foldersAll, allfoldersToSkip)
-	filteredFilesByName, err := scanner.ListFiles(filteredFoldersByName)
-	terminal.PrintError("Failed listing filteredFilesByName", err)
-
+	suffixesToScan := terminal.InputList("[NEW] Suffixes to scan", c.SuffixesToScan)
 	filteredFilesBySuffix := scanner.FilterFilesBySuffix(filteredFilesByName, suffixesToScan)
+
 	lines := scanner.ScanFilesContent(filteredFilesBySuffix)
 	terminal.PrintLines("CONTENT OF FILES", lines)
 }
 
-func (c Config) RunTree() {
-	pathToScan := terminal.InputPath("[NEW] Path To scan", c.PathToScan)
+func (c config) RunTree(folders []string) {
 	foldersToSkip := terminal.InputList("[ADD] Folders to skip", c.FoldersToSkip)
 	foldersTreeToSkip := terminal.InputList("[ADD] Folders tree to skip", c.FoldersTreeToSkip)
 
 	allfoldersToSkip := append(c.FoldersToSkip, foldersToSkip...)
 	allFoldersTreeToSkip := append(c.FoldersTreeToSkip, foldersTreeToSkip...)
 
-	foldersAll, err := scanner.ListFolders(pathToScan)
-	terminal.PrintError("Failed listing foldersAll", err)
-
-	filteredFolders := scanner.FilterFoldersByName(foldersAll, allfoldersToSkip)
-	filteredFiles, err := scanner.ListFiles(filteredFolders)
-	terminal.PrintError("Failed listing filteredFiles", err)
+	filteredFolders := scanner.FilterFoldersByName(folders, allfoldersToSkip)
+	filteredFiles := scanner.ListFiles(filteredFolders)
 
 	lines := scanner.CreateTree(filteredFolders, filteredFiles, allFoldersTreeToSkip)
 	terminal.PrintLines("ASCII TREE", lines)
 }
 
-func (c Config) RunFoldersEmpty() {
+func (c config) RunFoldersEmpty(folders []string) {
 	pathToScan := terminal.InputPath("[NEW] Path To scan", c.PathToScan)
 	foldersToSkip := terminal.InputList("[ADD] Folders to skip", c.FoldersToSkip)
 
 	allfoldersToSkip := append(c.FoldersToSkip, foldersToSkip...)
 
-	foldersAll, err := scanner.ListFolders(pathToScan)
-	terminal.PrintError("Failed listing foldersAll", err)
-
-	filteredFolders := scanner.FilterFoldersByName(foldersAll, allfoldersToSkip)
-	foldersEmpty, err := scanner.FindFoldersEmpty(filteredFolders)
-	terminal.PrintError("Failed listing foldersEmpty", err)
+	filteredFolders := scanner.FilterFoldersByName(folders, allfoldersToSkip)
+	foldersEmpty := scanner.FindFoldersEmpty(filteredFolders)
 
 	terminal.PrintFolders("EMPTY FOLDERS", pathToScan, foldersEmpty)
 }
 
-func (c Config) RunFoldersBySuffix() {
+func (c config) RunFoldersBySuffix(folders []string) {
 	pathToScan := terminal.InputPath("[NEW] Path To scan", c.PathToScan)
 	suffixesToScan := terminal.InputList("[NEW] Suffixes to scan", c.SuffixesToScan)
 	foldersToSkip := terminal.InputList("[ADD] Folders to skip", c.FoldersToSkip)
 
 	allfoldersToSkip := append(c.FoldersToSkip, foldersToSkip...)
 
-	foldersAll, err := scanner.ListFolders(pathToScan)
-	terminal.PrintError("Failed listing foldersAll", err)
-
-	filteredFolders := scanner.FilterFoldersByName(foldersAll, allfoldersToSkip)
-	foldersByFileSuffix, err := scanner.FindFoldersByFileSuffix(filteredFolders, suffixesToScan)
-	terminal.PrintError("Failed listing folderByFileSuffix", err)
+	filteredFolders := scanner.FilterFoldersByName(folders, allfoldersToSkip)
+	foldersByFileSuffix := scanner.FindFoldersByFileSuffix(filteredFolders, suffixesToScan)
 
 	terminal.PrintFolders("FOUND FOLDERS", pathToScan, foldersByFileSuffix)
 }
 
-func (c Config) RunFilesCompare() {
-	pathToScan1 := terminal.InputPath("[NEW] Path to scan 1", c.PathToScan)
-	pathToScan2 := terminal.InputPath("[NEW] Path to scan 2", c.PathToScan)
+func (c config) RunFilesCompare(folders1, folders2 []string) {
+	filteredFolders1 := scanner.FilterFoldersByName(folders1, c.FoldersToSkip)
+	filteredFolders2 := scanner.FilterFoldersByName(folders2, c.FoldersToSkip)
 
-	foldersAll1, err := scanner.ListFolders(pathToScan1)
-	terminal.PrintError("Failed listing foldersAll1", err)
-	foldersAll2, err := scanner.ListFolders(pathToScan2)
-	terminal.PrintError("Failed listing foldersAll1", err)
+	filteredFiles1 := scanner.ListFiles(filteredFolders1)
+	filteredFiles2 := scanner.ListFiles(filteredFolders2)
+	onlyIn1, onlyIn2 := scanner.CompareFiles(filteredFiles1, filteredFiles2)
 
-	filteredFolders1 := scanner.FilterFoldersByName(foldersAll1, c.FoldersToSkip)
-	filteredFolders2 := scanner.FilterFoldersByName(foldersAll2, c.FoldersToSkip)
-
-	filteredFiles1, err := scanner.ListFiles(filteredFolders1)
-	terminal.PrintError("Failed listing filteredFiles1", err)
-	filteredFiles2, err := scanner.ListFiles(filteredFolders2)
-	terminal.PrintError("Failed listing filteredFiles2", err)
-
-	onlyIn1, onlyIn2, err := scanner.CompareFiles(filteredFiles1, filteredFiles2)
-	terminal.PrintError("Failed listing differences", err)
-
-	terminal.PrintCompare("FILE COMPARISON", pathToScan1, pathToScan2, onlyIn1, onlyIn2)
+	terminal.PrintCompare("FILE COMPARISON", folders1[0], folders2[0], onlyIn1, onlyIn2)
 }

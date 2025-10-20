@@ -16,11 +16,11 @@ func PrintLines(msg string, lines []string) {
 	printSep()
 }
 
-func PrintFolders(msg, root string, lines []string) {
+func PrintFolders(msg, path string, lines []string) {
 	printMsg(msg)
 
 	for _, folder := range lines {
-		pathRel, err := filepath.Rel(root, folder)
+		pathRel, err := filepath.Rel(path, folder)
 		if err != nil {
 			pathRel = folder
 		}
@@ -33,15 +33,14 @@ func PrintFolders(msg, root string, lines []string) {
 
 func PrintCompare(msg, path1, path2 string, onlyIn1, onlyIn2 []string) {
 	printMsg(msg)
-	fmt.Printf("PATH 1: %s\nPATH 2: %s\n\n", path1, path2)
 
-	fmt.Println("[ONLY IN PATH 1]")
+	printMsg(fmt.Sprintf("ONLY IN %s", path1))
 	for _, p := range onlyIn1 {
 		fmt.Println(p)
 	}
 	fmt.Printf("\nTOTAL: %d\n\n", len(onlyIn1))
 
-	fmt.Println("[ONLY IN PATH 2]")
+	printMsg(fmt.Sprintf("ONLY IN %s", path2))
 	for _, p := range onlyIn2 {
 		fmt.Println(p)
 	}

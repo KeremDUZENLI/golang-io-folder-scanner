@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func CompareFiles(files1, files2 []string) ([]string, []string, error) {
+func CompareFiles(files1, files2 []string) ([]string, []string) {
 	root1 := commonDir(files1)
 	root2 := commonDir(files2)
 
@@ -23,7 +23,7 @@ func CompareFiles(files1, files2 []string) ([]string, []string, error) {
 
 	onlyIn1 := diffKeys(set1, set2)
 	onlyIn2 := diffKeys(set2, set1)
-	return onlyIn1, onlyIn2, nil
+	return onlyIn1, onlyIn2
 }
 
 func commonDir(paths []string) string {

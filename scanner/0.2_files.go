@@ -7,41 +7,9 @@ import (
 	"strings"
 )
 
-func ListFolders(root string) ([]string, error) {
-	folders := make([]string, 0, 64)
-	stack := []string{root}
-
-	for len(stack) > 0 {
-		dir := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-
-		folders = append(folders, dir)
-
-		entries, err := os.ReadDir(dir)
-		if err != nil {
-			continue
-		}
-
-		folderNames := make([]string, 0, len(entries))
-		for _, entry := range entries {
-			if entry.IsDir() {
-				folderNames = append(folderNames, entry.Name())
-			}
-		}
-
-		sortStrings(folderNames)
-
-		for i := len(folderNames) - 1; i >= 0; i-- {
-			stack = append(stack, filepath.Join(dir, folderNames[i]))
-		}
-	}
-
-	return folders, nil
-}
-
-func ListFiles(folders []string) ([]string, error) {
+func ListFiles(folders []string) []string {
 	if len(folders) == 0 {
-		return nil, nil
+		return nil
 	}
 
 	allow := make(map[string]struct{}, len(folders))
@@ -56,7 +24,7 @@ func ListFiles(folders []string) ([]string, error) {
 		_ = listAllowed(folder, &files, allow, visited)
 	}
 
-	return files, nil
+	return files
 }
 
 func listAllowed(folder string, files *[]string, allow map[string]struct{}, visited map[string]struct{}) error {
@@ -64,7 +32,7 @@ func listAllowed(folder string, files *[]string, allow map[string]struct{}, visi
 		return nil
 	}
 
-	key := normDir(folder)
+	key := normalizeFolders(folder)
 	if _, ok := visited[key]; ok {
 		return nil
 	}
@@ -97,7 +65,7 @@ func listAllowed(folder string, files *[]string, allow map[string]struct{}, visi
 	return nil
 }
 
-func normDir(p string) string {
+func normalizeFolders(p string) string {
 	return strings.ToLower(filepath.ToSlash(filepath.Clean(p)))
 }
 

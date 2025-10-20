@@ -5,34 +5,31 @@ import (
 	"path/filepath"
 )
 
-func FindFoldersEmpty(folders []string) ([]string, error) {
+func FindFoldersEmpty(folders []string) []string {
 	foldersEmpty := []string{}
 	for _, folder := range folders {
-		hasFile, err := walkFolderHas(folder, func(_ string) bool { return true })
-		if err != nil {
-			return nil, err
-		}
+		hasFile, _ := walkFolderHas(folder, func(_ string) bool { return true })
 		if !hasFile {
 			foldersEmpty = append(foldersEmpty, folder)
 		}
 	}
 
-	return foldersEmpty, nil
+	return foldersEmpty
 }
 
-func FindFoldersByFileSuffix(folders []string, suffixesToFind []string) ([]string, error) {
+func FindFoldersByFileSuffix(folders []string, suffixesToFind []string) []string {
 	foldersByFileSuffix := []string{}
 	for _, folder := range folders {
 		found, err := walkFolderHas(folder, func(p string) bool { return hasSuffix(p, suffixesToFind) })
 		if err != nil {
-			return nil, err
+			return nil
 		}
 		if found {
 			foldersByFileSuffix = append(foldersByFileSuffix, folder)
 		}
 	}
 
-	return foldersByFileSuffix, nil
+	return foldersByFileSuffix
 }
 
 func walkFolderHas(folder string, match func(filePath string) bool) (bool, error) {
