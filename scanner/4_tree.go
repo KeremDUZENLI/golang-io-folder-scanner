@@ -10,7 +10,8 @@ type treeEntry struct {
 	isDir       bool
 }
 
-func CreateTree(root string, folders, files, foldersTreeToSkip []string) []string {
+func CreateTree(folders, files, foldersTreeToSkip []string) []string {
+	root := folders[0]
 	dirKids := make(map[string][]string, len(folders))
 	fileKids := make(map[string][]string, len(files))
 

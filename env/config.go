@@ -17,12 +17,11 @@ var ConfigDefault = Config{
 	},
 
 	FoldersToSkip: []string{
-		"__pycache__",
-		"node_modules",
-		"target",
-		".git", ".env", ".venv",
-		".vscode", ".idea", ".out",
-		"dist", "build", "bin", "vendor",
+		"__pycache__", "node_modules",
+		".git", ".gitignore",
+		".env", ".venv", ".vscode",
+		".idea", ".out",
+		"dist", "build", "bin", "vendor", "target",
 	},
 
 	FoldersTreeToSkip: []string{

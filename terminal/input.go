@@ -18,19 +18,6 @@ func InputPath(prompt string, defaultVal string) string {
 	return absolutePathToScan(input)
 }
 
-func InputList(prompt string, defaultVal []string) []string {
-	input := readLine(prompt, listToString(defaultVal))
-	if input == "" {
-		return defaultVal
-	}
-	return stringToList(input)
-}
-
-func InputKeypress() {
-	fmt.Print("\nPress ENTER to exit")
-	fmt.Scanln()
-}
-
 func readLine(prompt, defaultVal string) string {
 	fmt.Printf("%s (default = %s): ", prompt, defaultVal)
 	input, err := reader.ReadString('\n')
@@ -43,6 +30,14 @@ func absolutePathToScan(directoryToScan string) string {
 	PrintError("Failed to format path to scan", err)
 
 	return absPath
+}
+
+func InputList(prompt string, defaultVal []string) []string {
+	input := readLine(prompt, listToString(defaultVal))
+	if input == "" {
+		return defaultVal
+	}
+	return stringToList(input)
 }
 
 func listToString(list []string) string {
@@ -59,4 +54,9 @@ func stringToList(s string) []string {
 		}
 	}
 	return out
+}
+
+func InputKeypress() {
+	fmt.Print("\nPress ENTER to exit")
+	fmt.Scanln()
 }

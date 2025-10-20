@@ -14,4 +14,5 @@ func main() {
 	cfg.RunTree()
 	cfg.RunFoldersEmpty()
 	cfg.RunFoldersBySuffix()
+	cfg.RunFilesCompare()
 }

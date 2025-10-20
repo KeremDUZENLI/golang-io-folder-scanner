@@ -39,7 +39,7 @@ func (c Config) RunTree() {
 	filteredFiles, err := scanner.ListFiles(filteredFolders)
 	terminal.PrintError("Failed listing filteredFiles", err)
 
-	lines := scanner.CreateTree(pathToScan, filteredFolders, filteredFiles, allFoldersTreeToSkip)
+	lines := scanner.CreateTree(filteredFolders, filteredFiles, allFoldersTreeToSkip)
 	terminal.PrintLines("ASCII TREE", lines)
 }
 
@@ -74,4 +74,27 @@ func (c Config) RunFoldersBySuffix() {
 	terminal.PrintError("Failed listing folderByFileSuffix", err)
 
 	terminal.PrintFolders("FOUND FOLDERS", pathToScan, foldersByFileSuffix)
+}
+
+func (c Config) RunFilesCompare() {
+	pathToScan1 := terminal.InputPath("[NEW] Path to scan 1", c.PathToScan)
+	pathToScan2 := terminal.InputPath("[NEW] Path to scan 2", c.PathToScan)
+
+	foldersAll1, err := scanner.ListFolders(pathToScan1)
+	terminal.PrintError("Failed listing foldersAll1", err)
+	foldersAll2, err := scanner.ListFolders(pathToScan2)
+	terminal.PrintError("Failed listing foldersAll1", err)
+
+	filteredFolders1 := scanner.FilterFoldersByName(foldersAll1, c.FoldersToSkip)
+	filteredFolders2 := scanner.FilterFoldersByName(foldersAll2, c.FoldersToSkip)
+
+	filteredFiles1, err := scanner.ListFiles(filteredFolders1)
+	terminal.PrintError("Failed listing filteredFiles1", err)
+	filteredFiles2, err := scanner.ListFiles(filteredFolders2)
+	terminal.PrintError("Failed listing filteredFiles2", err)
+
+	onlyIn1, onlyIn2, err := scanner.CompareFiles(filteredFiles1, filteredFiles2)
+	terminal.PrintError("Failed listing differences", err)
+
+	terminal.PrintCompare("FILE COMPARISON", pathToScan1, pathToScan2, onlyIn1, onlyIn2)
 }

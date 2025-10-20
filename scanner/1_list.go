@@ -44,22 +44,39 @@ func ListFiles(folders []string) ([]string, error) {
 		return nil, nil
 	}
 
-	files := []string{}
-	root := folders[0]
+	allow := make(map[string]struct{}, len(folders))
+	for _, d := range folders {
+		allow[d] = struct{}{}
+	}
 
-	err := listFilesRecursive(root, &files)
-	return files, err
+	files := make([]string, 0, 256)
+	visited := make(map[string]struct{}, len(folders))
+
+	for _, folder := range folders {
+		_ = listAllowed(folder, &files, allow, visited)
+	}
+
+	return files, nil
 }
 
-func listFilesRecursive(dir string, files *[]string) error {
-	entries, err := os.ReadDir(dir)
+func listAllowed(folder string, files *[]string, allow map[string]struct{}, visited map[string]struct{}) error {
+	if _, ok := allow[folder]; !ok {
+		return nil
+	}
+
+	key := normDir(folder)
+	if _, ok := visited[key]; ok {
+		return nil
+	}
+	visited[key] = struct{}{}
+
+	entries, err := os.ReadDir(folder)
 	if err != nil {
 		return err
 	}
 
 	folders := []string{}
 	fileNames := []string{}
-
 	for _, e := range entries {
 		if e.IsDir() {
 			folders = append(folders, e.Name())
@@ -69,19 +86,19 @@ func listFilesRecursive(dir string, files *[]string) error {
 	}
 
 	sortStrings(folders)
-	sortStrings(fileNames)
 
-	for _, folder := range folders {
-		subdir := filepath.Join(dir, folder)
-		if err := listFilesRecursive(subdir, files); err != nil {
-			continue
-		}
+	for _, f := range folders {
+		_ = listAllowed(filepath.Join(folder, f), files, allow, visited)
 	}
 	for _, name := range fileNames {
-		*files = append(*files, filepath.Join(dir, name))
+		*files = append(*files, filepath.Join(folder, name))
 	}
 
 	return nil
+}
+
+func normDir(p string) string {
+	return strings.ToLower(filepath.ToSlash(filepath.Clean(p)))
 }
 
 func sortStrings(names []string) {
