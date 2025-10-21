@@ -3,7 +3,6 @@ package scanner
 import (
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 func ListFolders(root string) []string {
@@ -21,8 +20,9 @@ func ListFolders(root string) []string {
 		if err != nil {
 			continue
 		}
-		entries, err := fd.ReadDir(-1)
-		_ = fd.Close()
+		defer fd.Close()
+
+		entries, err := fd.ReadDir(-1) // DO NOT sort; native order defines traversal & file order
 		if err != nil {
 			continue
 		}
@@ -44,6 +44,5 @@ func ListFolders(root string) []string {
 func canonicalPath(path string) string {
 	pathAbs, _ := filepath.Abs(path)
 	clean := filepath.Clean(pathAbs)
-	slashed := filepath.ToSlash(clean)
-	return strings.ToLower(slashed)
+	return filepath.ToSlash(clean)
 }

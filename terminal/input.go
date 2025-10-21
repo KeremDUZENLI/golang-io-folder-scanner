@@ -4,32 +4,17 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
 var reader = bufio.NewReader(os.Stdin)
 
-func InputPath(prompt string, defaultVal string) string {
+func InputPath(prompt, defaultVal string) string {
 	input := readLine(prompt, defaultVal)
 	if input == "" {
-		return absolutePathToScan(defaultVal)
+		return defaultVal
 	}
-	return absolutePathToScan(input)
-}
-
-func readLine(prompt, defaultVal string) string {
-	fmt.Printf("%s (default = %s): ", prompt, defaultVal)
-	input, err := reader.ReadString('\n')
-	PrintError("Failed to read input", err)
-	return strings.TrimSpace(input)
-}
-
-func absolutePathToScan(directoryToScan string) string {
-	absPath, err := filepath.Abs(directoryToScan)
-	PrintError("Failed to format path to scan", err)
-
-	return absPath
+	return input
 }
 
 func InputList(prompt string, defaultVal []string) []string {
@@ -38,6 +23,18 @@ func InputList(prompt string, defaultVal []string) []string {
 		return defaultVal
 	}
 	return stringToList(input)
+}
+
+func InputKeypress() {
+	fmt.Print("\nPress ENTER to exit")
+	fmt.Scanln()
+}
+
+func readLine(prompt, defaultVal string) string {
+	fmt.Printf("%s (default = %s): ", prompt, defaultVal)
+	input, err := reader.ReadString('\n')
+	PrintError("Failed to read input", err)
+	return strings.TrimSpace(input)
 }
 
 func listToString(list []string) string {
@@ -54,9 +51,4 @@ func stringToList(s string) []string {
 		}
 	}
 	return out
-}
-
-func InputKeypress() {
-	fmt.Print("\nPress ENTER to exit")
-	fmt.Scanln()
 }

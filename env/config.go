@@ -1,13 +1,13 @@
 package env
 
-type config struct {
+type Config struct {
 	PathToScan        string
 	SuffixesToScan    []string
 	FoldersToSkip     []string
 	FoldersTreeToSkip []string
 }
 
-var ConfigDefault = config{
+var ConfigDefault = Config{
 	PathToScan: ".",
 
 	SuffixesToScan: []string{

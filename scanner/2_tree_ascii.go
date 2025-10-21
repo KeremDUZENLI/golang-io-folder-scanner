@@ -26,7 +26,7 @@ func CreateTree(folders, files, foldersTreeToSkip []string) []string {
 		fileKids[parent] = append(fileKids[parent], f)
 	}
 
-	lines := []string{path.Base(root)}
+	lines := []string{root}
 	return renderTree(root, "", dirKids, fileKids, foldersTreeToSkip, lines)
 }
 
@@ -47,18 +47,18 @@ func renderTree(parent, prefix string, dirKids, fileKids map[string][]string, fo
 func listTreeEntries(parent string, dirKids, fileKids map[string][]string) []treeEntry {
 	entries := make([]treeEntry, 0, len(dirKids[parent])+len(fileKids[parent]))
 
-	for _, d := range dirKids[parent] {
+	for _, dir := range dirKids[parent] {
 		entries = append(entries, treeEntry{
-			pathFull:    d,
-			contentName: path.Base(d),
+			pathFull:    dir,
+			contentName: dir,
 			isDir:       true,
 		})
 	}
 
-	for _, f := range fileKids[parent] {
+	for _, file := range fileKids[parent] {
 		entries = append(entries, treeEntry{
-			pathFull:    f,
-			contentName: path.Base(f),
+			pathFull:    file,
+			contentName: file,
 			isDir:       false,
 		})
 	}

@@ -38,8 +38,9 @@ func listAllowed(folder string, files *[]string, allow map[string]struct{}, visi
 	if err != nil {
 		return err
 	}
-	entries, err := fd.ReadDir(-1)
-	_ = fd.Close()
+	defer fd.Close()
+
+	entries, err := fd.ReadDir(-1) // DO NOT sort; native order defines traversal & file order
 	if err != nil {
 		return err
 	}
@@ -55,6 +56,8 @@ func listAllowed(folder string, files *[]string, allow map[string]struct{}, visi
 			filesInThisDir = append(filesInThisDir, canonicalPath(filepath.Join(folder, name)))
 		}
 	}
+
+	// Recurse into subdirs in left-to-right native order; then emit this dir’s files
 	for i := 0; i < len(dirs); i++ {
 		_ = listAllowed(dirs[i], files, allow, visited)
 	}

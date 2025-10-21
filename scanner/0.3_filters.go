@@ -6,13 +6,9 @@ import (
 )
 
 func FilterFolders(folders, foldersToSkip []string) []string {
-	if len(foldersToSkip) == 0 {
-		return folders
-	}
-
 	foldersToSkipDict := make(map[string]struct{}, len(foldersToSkip))
 	for _, folderToSkip := range foldersToSkip {
-		foldersToSkipDict[strings.ToLower(folderToSkip)] = struct{}{}
+		foldersToSkipDict[folderToSkip] = struct{}{}
 	}
 
 	filteredFoldersByName := make([]string, 0, len(folders))
@@ -27,18 +23,9 @@ func FilterFolders(folders, foldersToSkip []string) []string {
 }
 
 func FilterFilesBySuffix(files, suffixesToScan []string) []string {
-	if len(suffixesToScan) == 0 {
-		return files
-	}
-
-	suffixesToScanList := make([]string, 0, len(suffixesToScan))
-	for _, s := range suffixesToScan {
-		suffixesToScanList = append(suffixesToScanList, strings.ToLower(s))
-	}
-
 	filteredFilesBySuffix := make([]string, 0, len(files))
 	for _, file := range files {
-		if hasSuffix(file, suffixesToScanList) {
+		if hasSuffix(file, suffixesToScan) {
 			filteredFilesBySuffix = append(filteredFilesBySuffix, file)
 		}
 	}

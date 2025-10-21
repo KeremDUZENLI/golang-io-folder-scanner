@@ -2,7 +2,6 @@ package terminal
 
 import (
 	"fmt"
-	"path/filepath"
 	"strings"
 )
 
@@ -16,16 +15,11 @@ func PrintLines(msg string, lines []string) {
 	printSep()
 }
 
-func PrintFolders(msg, root string, folders []string) {
+func PrintFolders(msg string, folders []string) {
 	printMsg(msg)
-	root = strings.TrimSuffix(filepath.ToSlash(root), "/") + "/"
 
 	for _, folder := range folders {
-		rel := strings.TrimPrefix(filepath.ToSlash(folder), root)
-		if rel == "" {
-			rel = "."
-		}
-		fmt.Println(rel)
+		fmt.Println(folder)
 	}
 
 	fmt.Printf("\nTOTAL: %d\n", len(folders))
