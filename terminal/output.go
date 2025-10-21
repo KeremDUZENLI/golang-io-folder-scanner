@@ -16,15 +16,16 @@ func PrintLines(msg string, lines []string) {
 	printSep()
 }
 
-func PrintFolders(msg, path string, folders []string) {
+func PrintFolders(msg, root string, folders []string) {
 	printMsg(msg)
+	root = strings.TrimSuffix(filepath.ToSlash(root), "/") + "/"
 
 	for _, folder := range folders {
-		pathRel, err := filepath.Rel(path, folder)
-		if err != nil {
-			pathRel = folder
+		rel := strings.TrimPrefix(filepath.ToSlash(folder), root)
+		if rel == "" {
+			rel = "."
 		}
-		fmt.Println(filepath.ToSlash(pathRel))
+		fmt.Println(rel)
 	}
 
 	fmt.Printf("\nTOTAL: %d\n", len(folders))

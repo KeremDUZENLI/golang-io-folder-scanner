@@ -1,7 +1,7 @@
 package scanner
 
 import (
-	"path/filepath"
+	"path"
 )
 
 type treeEntry struct {
@@ -12,20 +12,21 @@ type treeEntry struct {
 
 func CreateTree(folders, files, foldersTreeToSkip []string) []string {
 	root := folders[0]
+
 	dirKids := make(map[string][]string, len(folders))
 	fileKids := make(map[string][]string, len(files))
 
 	for _, d := range folders {
-		parent := filepath.Dir(d)
+		parent := path.Dir(d)
 		dirKids[parent] = append(dirKids[parent], d)
 	}
 
 	for _, f := range files {
-		parent := filepath.Dir(f)
+		parent := path.Dir(f)
 		fileKids[parent] = append(fileKids[parent], f)
 	}
 
-	lines := []string{filepath.Base(root)}
+	lines := []string{path.Base(root)}
 	return renderTree(root, "", dirKids, fileKids, foldersTreeToSkip, lines)
 }
 
@@ -49,7 +50,7 @@ func listTreeEntries(parent string, dirKids, fileKids map[string][]string) []tre
 	for _, d := range dirKids[parent] {
 		entries = append(entries, treeEntry{
 			pathFull:    d,
-			contentName: filepath.Base(d),
+			contentName: path.Base(d),
 			isDir:       true,
 		})
 	}
@@ -57,7 +58,7 @@ func listTreeEntries(parent string, dirKids, fileKids map[string][]string) []tre
 	for _, f := range fileKids[parent] {
 		entries = append(entries, treeEntry{
 			pathFull:    f,
-			contentName: filepath.Base(f),
+			contentName: path.Base(f),
 			isDir:       false,
 		})
 	}

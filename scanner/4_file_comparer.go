@@ -1,49 +1,64 @@
 package scanner
 
-import (
-	"path/filepath"
-	"strings"
-)
+import "strings"
 
 func CompareFiles(files1, files2 []string) ([]string, []string) {
-	root1 := commonDir(files1)
-	root2 := commonDir(files2)
+	root1 := commonDirCanonical(files1)
+	root2 := commonDirCanonical(files2)
 
-	set1 := make(map[string]struct{}, len(files1))
+	rel1 := make([]string, 0, len(files1))
 	for _, p := range files1 {
-		rel := toRelSlash(p, root1)
-		set1[strings.ToLower(rel)] = struct{}{}
+		rel1 = append(rel1, relCanonical(p, root1))
 	}
-
-	set2 := make(map[string]struct{}, len(files2))
+	rel2 := make([]string, 0, len(files2))
 	for _, p := range files2 {
-		rel := toRelSlash(p, root2)
-		set2[strings.ToLower(rel)] = struct{}{}
+		rel2 = append(rel2, relCanonical(p, root2))
 	}
 
-	onlyIn1 := diffKeys(set1, set2)
-	onlyIn2 := diffKeys(set2, set1)
+	set1 := make(map[string]struct{}, len(rel1))
+	for _, r := range rel1 {
+		set1[r] = struct{}{}
+	}
+	set2 := make(map[string]struct{}, len(rel2))
+	for _, r := range rel2 {
+		set2[r] = struct{}{}
+	}
+
+	onlyIn1 := make([]string, 0, len(rel1))
+	seen1 := make(map[string]struct{}, 8)
+	for _, r := range rel1 {
+		if _, ok := set2[r]; !ok {
+			if _, dup := seen1[r]; !dup {
+				onlyIn1 = append(onlyIn1, r)
+				seen1[r] = struct{}{}
+			}
+		}
+	}
+
+	onlyIn2 := make([]string, 0, len(rel2))
+	seen2 := make(map[string]struct{}, 8)
+	for _, r := range rel2 {
+		if _, ok := set1[r]; !ok {
+			if _, dup := seen2[r]; !dup {
+				onlyIn2 = append(onlyIn2, r)
+				seen2[r] = struct{}{}
+			}
+		}
+	}
+
 	return onlyIn1, onlyIn2
 }
 
-func commonDir(paths []string) string {
+func commonDirCanonical(paths []string) string {
 	if len(paths) == 0 {
 		return ""
 	}
-
-	split := func(s string) []string {
-		clean := filepath.Clean(s)
-		return strings.Split(filepath.Dir(clean), string(filepath.Separator))
-	}
-
-	parts := split(paths[0])
-
+	parts := strings.Split(paths[0], "/")
 	for _, p := range paths[1:] {
-		q := split(p)
+		q := strings.Split(p, "/")
 		n := min(len(parts), len(q))
-
 		i := 0
-		for i < n && strings.EqualFold(parts[i], q[i]) {
+		for i < n && parts[i] == q[i] {
 			i++
 		}
 		parts = parts[:i]
@@ -51,38 +66,23 @@ func commonDir(paths []string) string {
 			break
 		}
 	}
-
 	if len(parts) == 0 {
-		vol := filepath.VolumeName(paths[0])
-		if vol != "" {
-			return vol + string(filepath.Separator)
-		}
 		return ""
 	}
-	return strings.Join(parts, string(filepath.Separator))
+	return strings.Join(parts, "/")
 }
 
-func toRelSlash(absPath, root string) string {
+func relCanonical(abs, root string) string {
 	if root == "" {
-		return filepath.ToSlash(absPath)
+		return abs
 	}
-	rel, err := filepath.Rel(root, absPath)
-	if err != nil {
-		rel = absPath
+	if !strings.HasSuffix(root, "/") {
+		root += "/"
 	}
-	return filepath.ToSlash(rel)
-}
-
-func diffKeys(a, b map[string]struct{}) []string {
-	out := make([]string, 0, len(a))
-	for k := range a {
-		if _, ok := b[k]; !ok {
-			out = append(out, k)
-		}
+	if strings.HasPrefix(abs, root) {
+		return strings.TrimPrefix(abs, root)
 	}
-
-	sortStrings(out)
-	return out
+	return abs
 }
 
 func min(a, b int) int {

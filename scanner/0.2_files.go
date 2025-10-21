@@ -3,8 +3,6 @@ package scanner
 import (
 	"os"
 	"path/filepath"
-	"sort"
-	"strings"
 )
 
 func ListFiles(folders []string) []string {
@@ -31,48 +29,37 @@ func listAllowed(folder string, files *[]string, allow map[string]struct{}, visi
 	if _, ok := allow[folder]; !ok {
 		return nil
 	}
-
-	key := normalizeFolders(folder)
-	if _, ok := visited[key]; ok {
+	if _, ok := visited[folder]; ok {
 		return nil
 	}
-	visited[key] = struct{}{}
+	visited[folder] = struct{}{}
 
-	entries, err := os.ReadDir(folder)
+	fd, err := os.Open(folder)
+	if err != nil {
+		return err
+	}
+	entries, err := fd.ReadDir(-1)
+	_ = fd.Close()
 	if err != nil {
 		return err
 	}
 
-	folders := []string{}
-	fileNames := []string{}
+	dirs := make([]string, 0, 8)
+	filesInThisDir := make([]string, 0, 16)
+
 	for _, e := range entries {
+		name := e.Name()
 		if e.IsDir() {
-			folders = append(folders, e.Name())
+			dirs = append(dirs, canonicalPath(filepath.Join(folder, name)))
 		} else {
-			fileNames = append(fileNames, e.Name())
+			filesInThisDir = append(filesInThisDir, canonicalPath(filepath.Join(folder, name)))
 		}
 	}
-
-	sortStrings(folders)
-
-	for _, f := range folders {
-		_ = listAllowed(filepath.Join(folder, f), files, allow, visited)
+	for i := 0; i < len(dirs); i++ {
+		_ = listAllowed(dirs[i], files, allow, visited)
 	}
-	for _, name := range fileNames {
-		*files = append(*files, filepath.Join(folder, name))
-	}
+
+	*files = append(*files, filesInThisDir...)
 
 	return nil
-}
-
-func normalizeFolders(p string) string {
-	return strings.ToLower(filepath.ToSlash(filepath.Clean(p)))
-}
-
-func sortStrings(names []string) {
-	sort.Slice(names, func(i, j int) bool { return sortAToZ(names[i], names[j]) })
-}
-
-func sortAToZ(a, b string) bool {
-	return strings.ToLower(a) < strings.ToLower(b)
 }
