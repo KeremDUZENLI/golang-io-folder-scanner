@@ -16,10 +16,10 @@ func PrintLines(msg string, lines []string) {
 	printSep()
 }
 
-func PrintFolders(msg, path string, lines []string) {
+func PrintFolders(msg, path string, folders []string) {
 	printMsg(msg)
 
-	for _, folder := range lines {
+	for _, folder := range folders {
 		pathRel, err := filepath.Rel(path, folder)
 		if err != nil {
 			pathRel = folder
@@ -27,7 +27,7 @@ func PrintFolders(msg, path string, lines []string) {
 		fmt.Println(filepath.ToSlash(pathRel))
 	}
 
-	fmt.Printf("\nTOTAL: %d\n", len(lines))
+	fmt.Printf("\nTOTAL: %d\n", len(folders))
 	printSep()
 }
 

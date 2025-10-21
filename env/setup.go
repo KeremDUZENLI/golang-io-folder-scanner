@@ -14,58 +14,45 @@ func (c config) RunScanFilesContent(folders []string) {
 	foldersToSkip := terminal.InputList("[ADD] Folders to skip", c.FoldersToSkip)
 	allfoldersToSkip := append(c.FoldersToSkip, foldersToSkip...)
 
-	filteredFoldersByName := scanner.FilterFoldersByName(folders, allfoldersToSkip)
-	filteredFilesByName := scanner.ListFiles(filteredFoldersByName)
+	filteredFolders := scanner.FilterFolders(folders, allfoldersToSkip)
+	filteredFoldersFiles := scanner.ListFiles(filteredFolders)
 
 	suffixesToScan := terminal.InputList("[NEW] Suffixes to scan", c.SuffixesToScan)
-	filteredFilesBySuffix := scanner.FilterFilesBySuffix(filteredFilesByName, suffixesToScan)
+	filteredFilesBySuffix := scanner.FilterFilesBySuffix(filteredFoldersFiles, suffixesToScan)
 
 	lines := scanner.ScanFilesContent(filteredFilesBySuffix)
 	terminal.PrintLines("CONTENT OF FILES", lines)
 }
 
 func (c config) RunTree(folders []string) {
-	foldersToSkip := terminal.InputList("[ADD] Folders to skip", c.FoldersToSkip)
-	foldersTreeToSkip := terminal.InputList("[ADD] Folders tree to skip", c.FoldersTreeToSkip)
+	filteredFolders := scanner.FilterFolders(folders, c.FoldersToSkip)
+	filteredFoldersFiles := scanner.ListFiles(filteredFolders)
 
-	allfoldersToSkip := append(c.FoldersToSkip, foldersToSkip...)
+	foldersTreeToSkip := terminal.InputList("[ADD] Folders tree to skip", c.FoldersTreeToSkip)
 	allFoldersTreeToSkip := append(c.FoldersTreeToSkip, foldersTreeToSkip...)
 
-	filteredFolders := scanner.FilterFoldersByName(folders, allfoldersToSkip)
-	filteredFiles := scanner.ListFiles(filteredFolders)
-
-	lines := scanner.CreateTree(filteredFolders, filteredFiles, allFoldersTreeToSkip)
+	lines := scanner.CreateTree(filteredFolders, filteredFoldersFiles, allFoldersTreeToSkip)
 	terminal.PrintLines("ASCII TREE", lines)
 }
 
 func (c config) RunFoldersEmpty(folders []string) {
-	pathToScan := terminal.InputPath("[NEW] Path To scan", c.PathToScan)
-	foldersToSkip := terminal.InputList("[ADD] Folders to skip", c.FoldersToSkip)
-
-	allfoldersToSkip := append(c.FoldersToSkip, foldersToSkip...)
-
-	filteredFolders := scanner.FilterFoldersByName(folders, allfoldersToSkip)
+	filteredFolders := scanner.FilterFolders(folders, c.FoldersToSkip)
 	foldersEmpty := scanner.FindFoldersEmpty(filteredFolders)
 
-	terminal.PrintFolders("EMPTY FOLDERS", pathToScan, foldersEmpty)
+	terminal.PrintFolders("EMPTY FOLDERS", folders[0], foldersEmpty)
 }
 
 func (c config) RunFoldersBySuffix(folders []string) {
-	pathToScan := terminal.InputPath("[NEW] Path To scan", c.PathToScan)
 	suffixesToScan := terminal.InputList("[NEW] Suffixes to scan", c.SuffixesToScan)
-	foldersToSkip := terminal.InputList("[ADD] Folders to skip", c.FoldersToSkip)
-
-	allfoldersToSkip := append(c.FoldersToSkip, foldersToSkip...)
-
-	filteredFolders := scanner.FilterFoldersByName(folders, allfoldersToSkip)
+	filteredFolders := scanner.FilterFolders(folders, c.FoldersToSkip)
 	foldersByFileSuffix := scanner.FindFoldersByFileSuffix(filteredFolders, suffixesToScan)
 
-	terminal.PrintFolders("FOUND FOLDERS", pathToScan, foldersByFileSuffix)
+	terminal.PrintFolders("FOUND FOLDERS", folders[0], foldersByFileSuffix)
 }
 
 func (c config) RunFilesCompare(folders1, folders2 []string) {
-	filteredFolders1 := scanner.FilterFoldersByName(folders1, c.FoldersToSkip)
-	filteredFolders2 := scanner.FilterFoldersByName(folders2, c.FoldersToSkip)
+	filteredFolders1 := scanner.FilterFolders(folders1, c.FoldersToSkip)
+	filteredFolders2 := scanner.FilterFolders(folders2, c.FoldersToSkip)
 
 	filteredFiles1 := scanner.ListFiles(filteredFolders1)
 	filteredFiles2 := scanner.ListFiles(filteredFolders2)

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func FilterFoldersByName(folders, foldersToSkip []string) []string {
+func FilterFolders(folders, foldersToSkip []string) []string {
 	if len(foldersToSkip) == 0 {
 		return folders
 	}
