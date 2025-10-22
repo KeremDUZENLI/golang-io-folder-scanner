@@ -23,7 +23,7 @@ func (c *Config) RunScanFilesContent(folders []string) {
 	filteredFiles := scanner.FilterFiles(filteredFoldersFiles, suffixesToScan)
 
 	lines := scanner.ScanFilesContent(filteredFiles)
-	terminal.PrintLines("CONTENT OF FILES", c.PathToScan, lines)
+	terminal.PrintFilesContents("CONTENT OF FILES", c.PathToScan, lines)
 }
 
 func (c *Config) RunTree(folders []string) {
@@ -34,7 +34,7 @@ func (c *Config) RunTree(folders []string) {
 	allFoldersTreeToSkip := append(c.FoldersTreeToSkip, foldersTreeToSkip...)
 
 	lines := scanner.CreateTree(filteredFolders, filteredFoldersFiles, allFoldersTreeToSkip)
-	terminal.PrintLines("ASCII TREE", c.PathToScan, lines)
+	terminal.PrintTreeASCII("ASCII TREE", c.PathToScan, lines)
 }
 
 func (c *Config) RunFoldersEmpty(folders []string) {
@@ -82,12 +82,16 @@ func (c *Config) RunTester(folders []string, input string) {
 		case "1":
 			lines := scanner.ScanFilesContent(files)
 			for _, i := range lines {
-				println(i)
+				println(i.Path)
+				println(i.Content)
 			}
 		case "2":
 			tree := scanner.CreateTree(folders, files, c.FoldersTreeToSkip)
 			for _, i := range tree {
-				println(i)
+				println(i.Path)
+				println(i.IsDir)
+				println(i.Depth)
+				println(i.AncestorLast)
 			}
 		case "3.1":
 			foldersEmpty := scanner.FindFoldersEmpty(folders)

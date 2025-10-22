@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/scanner"
 )
 
 func PrintLines(msg, base string, lines []string) {
@@ -14,6 +16,34 @@ func PrintLines(msg, base string, lines []string) {
 	}
 
 	fmt.Printf("\nTOTAL: %d\n", len(lines))
+	printSep()
+}
+
+func PrintFilesContents(msg, base string, lines []scanner.Content) {
+	printMsg(msg)
+
+	for _, line := range lines {
+		fmt.Println(relativePath(base, line.Path) + "=")
+		fmt.Println(line.Content)
+		fmt.Println(strings.Repeat("-", 100))
+	}
+
+	printSep()
+}
+
+func PrintTreeASCII(msg, base string, lines []scanner.TreeItem) {
+	printMsg(msg)
+
+	for _, line := range lines[1:] {
+		prefix := buildGuides(line.AncestorLast)
+		branch := "├── "
+		if len(line.AncestorLast) > 0 && line.AncestorLast[len(line.AncestorLast)-1] {
+			branch = "└── "
+		}
+		path := filepath.Base(relativePath(base, line.Path))
+		fmt.Println(prefix + branch + path)
+	}
+
 	printSep()
 }
 
@@ -57,4 +87,16 @@ func relativePath(base, path string) string {
 		return path
 	}
 	return filepath.ToSlash(rel)
+}
+
+func buildGuides(ancestorLast []bool) string {
+	var b strings.Builder
+	for i := 0; i < len(ancestorLast)-1; i++ {
+		if ancestorLast[i] {
+			b.WriteString("    ")
+		} else {
+			b.WriteString("│   ")
+		}
+	}
+	return b.String()
 }

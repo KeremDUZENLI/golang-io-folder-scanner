@@ -11,13 +11,13 @@ func main() {
 	cfg.PathToScan, _ = os.Getwd()
 	folders := cfg.RunPath()
 
-	cfg.RunTester(folders, "0.1, 0.2")
+	// cfg.RunTester(folders, "0.1, 0.2")
 
-	// cfg.RunScanFilesContent(folders)
-	// cfg.RunTree(folders)
-	// cfg.RunFoldersEmpty(folders)
-	// cfg.RunFoldersBySuffix(folders)
+	cfg.RunScanFilesContent(folders)
+	cfg.RunTree(folders)
+	cfg.RunFoldersEmpty(folders)
+	cfg.RunFoldersBySuffix(folders)
 
-	// foldersCompare := cfg.RunPath()
-	// cfg.RunFilesCompare(folders, foldersCompare)
+	foldersCompare := cfg.RunPath()
+	cfg.RunFilesCompare(folders, foldersCompare)
 }

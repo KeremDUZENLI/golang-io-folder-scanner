@@ -4,66 +4,85 @@ import (
 	"path"
 )
 
-type treeEntry struct {
-	pathFull    string
-	contentName string
-	isDir       bool
+type TreeItem struct {
+	Path         string
+	IsDir        bool
+	Depth        int
+	AncestorLast []bool
 }
 
-func CreateTree(folders, files, foldersTreeToSkip []string) []string {
+func CreateTree(folders, files, foldersTreeToSkip []string) []TreeItem {
 	root := folders[0]
-
 	dirKids := make(map[string][]string, len(folders))
 	fileKids := make(map[string][]string, len(files))
 
-	for _, d := range folders {
-		parent := path.Dir(d)
-		dirKids[parent] = append(dirKids[parent], d)
+	for _, folder := range folders {
+		parent := path.Dir(folder)
+		dirKids[parent] = append(dirKids[parent], folder)
+	}
+	for _, file := range files {
+		parent := path.Dir(file)
+		fileKids[parent] = append(fileKids[parent], file)
 	}
 
-	for _, f := range files {
-		parent := path.Dir(f)
-		fileKids[parent] = append(fileKids[parent], f)
-	}
+	TreeItems := make([]TreeItem, 0, len(folders)+len(files))
+	TreeItems = append(TreeItems, TreeItem{
+		Path:         root,
+		IsDir:        true,
+		Depth:        0,
+		AncestorLast: nil,
+	})
 
-	lines := []string{root}
-	return renderTree(root, "", dirKids, fileKids, foldersTreeToSkip, lines)
+	TreeItems = walkTree(root, 1, nil, dirKids, fileKids, foldersTreeToSkip, TreeItems)
+	return TreeItems
 }
 
-func renderTree(parent, prefix string, dirKids, fileKids map[string][]string, foldersContentToSkip, lines []string) []string {
-	entries := listTreeEntries(parent, dirKids, fileKids)
+func walkTree(
+	parent string,
+	depth int,
+	ancestors []bool,
+	dirKids,
+	fileKids map[string][]string,
+	skipNames []string,
+	treeItem []TreeItem,
+) []TreeItem {
+	entries := make([]struct {
+		p     string
+		isDir bool
+	}, 0, len(dirKids[parent])+len(fileKids[parent]))
+
+	for _, d := range dirKids[parent] {
+		entries = append(entries, struct {
+			p     string
+			isDir bool
+		}{p: d, isDir: true})
+	}
+	for _, f := range fileKids[parent] {
+		entries = append(entries, struct {
+			p     string
+			isDir bool
+		}{p: f, isDir: false})
+	}
 
 	for i, e := range entries {
-		lines = append(lines, prefix+treeBranch(i, len(entries))+e.contentName)
-		if e.isDir && !contains(foldersContentToSkip, e.contentName) {
-			nextPrefix := prefix + indent(i, len(entries))
-			lines = renderTree(e.pathFull, nextPrefix, dirKids, fileKids, foldersContentToSkip, lines)
+		isLast := (i == len(entries)-1)
+		anc := make([]bool, len(ancestors)+1)
+		copy(anc, ancestors)
+		anc[len(anc)-1] = isLast
+
+		item := TreeItem{
+			Path:         e.p,
+			IsDir:        e.isDir,
+			Depth:        depth,
+			AncestorLast: anc,
+		}
+		treeItem = append(treeItem, item)
+
+		if e.isDir && !contains(skipNames, path.Base(e.p)) {
+			treeItem = walkTree(e.p, depth+1, anc, dirKids, fileKids, skipNames, treeItem)
 		}
 	}
-
-	return lines
-}
-
-func listTreeEntries(parent string, dirKids, fileKids map[string][]string) []treeEntry {
-	entries := make([]treeEntry, 0, len(dirKids[parent])+len(fileKids[parent]))
-
-	for _, dir := range dirKids[parent] {
-		entries = append(entries, treeEntry{
-			pathFull:    dir,
-			contentName: dir,
-			isDir:       true,
-		})
-	}
-
-	for _, file := range fileKids[parent] {
-		entries = append(entries, treeEntry{
-			pathFull:    file,
-			contentName: file,
-			isDir:       false,
-		})
-	}
-
-	return entries
+	return treeItem
 }
 
 func contains(list []string, s string) bool {
@@ -72,22 +91,5 @@ func contains(list []string, s string) bool {
 			return true
 		}
 	}
-
 	return false
-}
-
-func treeBranch(i, total int) string {
-	if i == total-1 {
-		return "└── "
-	}
-
-	return "├── "
-}
-
-func indent(i, total int) string {
-	if i == total-1 {
-		return "    "
-	}
-
-	return "│   "
 }
