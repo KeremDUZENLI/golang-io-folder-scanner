@@ -17,10 +17,10 @@ func FindFoldersEmpty(folders []string) []string {
 	return foldersEmpty
 }
 
-func FindFoldersByFileSuffix(folders []string, suffixesToFind []string) []string {
+func FindFoldersByFileSuffix(folders []string, suffixesToScan []string) []string {
 	foldersByFileSuffix := []string{}
 	for _, folder := range folders {
-		found, err := walkFolderHas(folder, func(p string) bool { return hasSuffixFile(p, suffixesToFind) })
+		found, err := walkFolderHas(folder, func(p string) bool { return hasSuffixFile(p, suffixesToScan) })
 		if err != nil {
 			return nil
 		}

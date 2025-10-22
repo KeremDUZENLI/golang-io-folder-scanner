@@ -1,6 +1,8 @@
 package env
 
 import (
+	"strings"
+
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/scanner"
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/terminal"
 )
@@ -59,4 +61,48 @@ func (c *Config) RunFilesCompare(folders1, folders2 []string) {
 	onlyIn1, onlyIn2 := scanner.CompareFiles(filteredFiles1, filteredFiles2)
 
 	terminal.PrintCompare("FILE COMPARISON", folders1[0], folders2[0], onlyIn1, onlyIn2)
+}
+
+func (c *Config) RunTester(folders []string, input string) {
+	folders = scanner.FilterFolders(folders, c.FoldersToSkip)
+	files := scanner.ListFiles(folders)
+
+	numbers := strings.Split(input, ",")
+	for _, number := range numbers {
+		number = strings.TrimSpace(number)
+		switch number {
+		case "0.1":
+			for _, i := range folders {
+				println(i)
+			}
+		case "0.2":
+			for _, i := range files {
+				println(i)
+			}
+		case "1":
+			lines := scanner.ScanFilesContent(files)
+			for _, i := range lines {
+				println(i)
+			}
+		case "2":
+			tree := scanner.CreateTree(folders, files, c.FoldersTreeToSkip)
+			for _, i := range tree {
+				println(i)
+			}
+		case "3.1":
+			foldersEmpty := scanner.FindFoldersEmpty(folders)
+			for _, i := range foldersEmpty {
+				println(i)
+			}
+		case "3.2":
+			foldersByFileSuffix := scanner.FindFoldersByFileSuffix(folders, c.SuffixesToScan)
+			for _, i := range foldersByFileSuffix {
+				println(i)
+			}
+		default:
+			println("Unknown option:", number)
+		}
+
+		println(strings.Repeat("*", 100))
+	}
 }
