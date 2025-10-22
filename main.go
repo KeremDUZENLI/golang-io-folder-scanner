@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
@@ -9,15 +10,35 @@ import (
 func main() {
 	cfg := env.ConfigDefault
 	cfg.PathToScan, _ = os.Getwd()
-	folders := cfg.RunListFolders()
 
-	// cfg.RunTester("1, 2")
+	for {
+		var choice int
+		fmt.Println(env.InputString)
+		fmt.Scanln(&choice)
+		switch choice {
+		case 1:
+			cfg.Run_1_FilterFolders()
 
-	cfg.RunScanFilesContent(folders)
-	cfg.RunTree(folders)
-	cfg.RunFoldersEmpty(folders)
-	cfg.RunFoldersBySuffix(folders)
+		case 2:
+			cfg.Run_2_FilterFiles()
 
-	foldersCompare := cfg.RunListFolders()
-	cfg.RunFilesCompare(folders, foldersCompare)
+		case 3:
+			cfg.Run_3_ScanFilesContent()
+
+		case 4:
+			cfg.Run_4_ScanTree()
+
+		case 5:
+			cfg.Run_5_FindFoldersEmpty()
+
+		case 6:
+			cfg.Run_6_FindFoldersByFileSuffix()
+
+		case 7:
+			cfg.Run_7_CompareFiles()
+
+		default:
+			return
+		}
+	}
 }

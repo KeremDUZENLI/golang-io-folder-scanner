@@ -11,7 +11,7 @@ type TreeItem struct {
 	AncestorLast []bool
 }
 
-func CreateTree(folders, files, foldersTreeToSkip []string) []TreeItem {
+func ScanTree(folders, files, foldersTreeToSkip []string) []TreeItem {
 	root := folders[0]
 	dirKids := make(map[string][]string, len(folders))
 	fileKids := make(map[string][]string, len(files))

@@ -3,10 +3,12 @@ package scanner
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/helper"
 )
 
 func ListFolders(path string) []string {
-	path = canonicalPath(path)
+	path = helper.CanonicalPath(path)
 
 	folders := make([]string, 0, 64)
 	stack := []string{path}
@@ -20,9 +22,9 @@ func ListFolders(path string) []string {
 		if err != nil {
 			continue
 		}
-		defer fd.Close()
 
 		entries, err := fd.ReadDir(-1) // DO NOT sort; native order defines traversal & file order
+		fd.Close()
 		if err != nil {
 			continue
 		}
@@ -30,7 +32,7 @@ func ListFolders(path string) []string {
 		childDirs := make([]string, 0, 8)
 		for _, e := range entries {
 			if e.IsDir() {
-				childDirs = append(childDirs, canonicalPath(filepath.Join(dir, e.Name())))
+				childDirs = append(childDirs, helper.CanonicalPath(filepath.Join(dir, e.Name())))
 			}
 		}
 		for i := len(childDirs) - 1; i >= 0; i-- {
@@ -74,9 +76,9 @@ func listAllowedFiles(folder string, files *[]string, allow map[string]struct{},
 	if err != nil {
 		return err
 	}
-	defer fd.Close()
 
 	entries, err := fd.ReadDir(-1) // DO NOT sort; native order defines traversal & file order
+	fd.Close()
 	if err != nil {
 		return err
 	}
@@ -87,9 +89,9 @@ func listAllowedFiles(folder string, files *[]string, allow map[string]struct{},
 	for _, e := range entries {
 		name := e.Name()
 		if e.IsDir() {
-			dirs = append(dirs, canonicalPath(filepath.Join(folder, name)))
+			dirs = append(dirs, helper.CanonicalPath(filepath.Join(folder, name)))
 		} else {
-			filesInThisDir = append(filesInThisDir, canonicalPath(filepath.Join(folder, name)))
+			filesInThisDir = append(filesInThisDir, helper.CanonicalPath(filepath.Join(folder, name)))
 		}
 	}
 
@@ -101,10 +103,4 @@ func listAllowedFiles(folder string, files *[]string, allow map[string]struct{},
 	*files = append(*files, filesInThisDir...)
 
 	return nil
-}
-
-func canonicalPath(path string) string {
-	pathAbs, _ := filepath.Abs(path)
-	clean := filepath.Clean(pathAbs)
-	return filepath.ToSlash(clean)
 }

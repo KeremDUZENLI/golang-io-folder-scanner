@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/helper"
 )
 
 var reader = bufio.NewReader(os.Stdin)
@@ -14,7 +16,8 @@ func InputPath(prompt, defaultVal string) string {
 	if input == "" {
 		return defaultVal
 	}
-	return input
+
+	return helper.CanonicalPath(input)
 }
 
 func InputList(prompt string, defaultVal []string) []string {
@@ -22,7 +25,7 @@ func InputList(prompt string, defaultVal []string) []string {
 	if input == "" {
 		return defaultVal
 	}
-	return lowerCase(stringToList(input))
+	return lowerStrings(stringToList(input))
 }
 
 func InputKeypress() {
@@ -53,17 +56,10 @@ func stringToList(s string) []string {
 	return out
 }
 
-func lowerCase[T any](value T) T {
-	switch x := any(value).(type) {
-	case string:
-		return any(strings.ToLower(x)).(T)
-	case []string:
-		list := make([]string, len(x))
-		for i := range x {
-			list[i] = strings.ToLower(x[i])
-		}
-		return any(list).(T)
-	default:
-		return value
+func lowerStrings(inputs []string) []string {
+	out := make([]string, len(inputs))
+	for i, s := range inputs {
+		out[i] = strings.ToLower(s)
 	}
+	return out
 }

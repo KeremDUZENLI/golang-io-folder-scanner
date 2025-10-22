@@ -31,7 +31,7 @@ func PrintFilesContents(msg, base string, lines []scanner.Content) {
 	printSep()
 }
 
-func PrintTreeASCII(msg, base string, lines []scanner.TreeItem) {
+func PrintTree(msg, base string, lines []scanner.TreeItem) {
 	printMsg(msg)
 
 	for _, line := range lines[1:] {
