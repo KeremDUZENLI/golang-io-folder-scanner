@@ -9,15 +9,15 @@ import (
 func main() {
 	cfg := env.ConfigDefault
 	cfg.PathToScan, _ = os.Getwd()
-	folders := cfg.RunPath()
+	folders := cfg.RunListFolders()
 
-	// cfg.RunTester(folders, "0.1, 0.2")
+	// cfg.RunTester("1, 2")
 
 	cfg.RunScanFilesContent(folders)
 	cfg.RunTree(folders)
 	cfg.RunFoldersEmpty(folders)
 	cfg.RunFoldersBySuffix(folders)
 
-	foldersCompare := cfg.RunPath()
+	foldersCompare := cfg.RunListFolders()
 	cfg.RunFilesCompare(folders, foldersCompare)
 }
