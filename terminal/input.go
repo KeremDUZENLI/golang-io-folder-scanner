@@ -22,7 +22,7 @@ func InputList(prompt string, defaultVal []string) []string {
 	if input == "" {
 		return defaultVal
 	}
-	return stringToList(input)
+	return lowerCase(stringToList(input))
 }
 
 func InputKeypress() {
@@ -51,4 +51,19 @@ func stringToList(s string) []string {
 		}
 	}
 	return out
+}
+
+func lowerCase[T any](value T) T {
+	switch x := any(value).(type) {
+	case string:
+		return any(strings.ToLower(x)).(T)
+	case []string:
+		list := make([]string, len(x))
+		for i := range x {
+			list[i] = strings.ToLower(x[i])
+		}
+		return any(list).(T)
+	default:
+		return value
+	}
 }

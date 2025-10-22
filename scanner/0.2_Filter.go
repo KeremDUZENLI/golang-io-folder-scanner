@@ -22,10 +22,10 @@ func FilterFolders(folders, foldersToSkip []string) []string {
 	return filteredFoldersByName
 }
 
-func FilterFilesBySuffix(files, suffixesToScan []string) []string {
+func FilterFiles(files, suffixesToScan []string) []string {
 	filteredFilesBySuffix := make([]string, 0, len(files))
 	for _, file := range files {
-		if hasSuffix(file, suffixesToScan) {
+		if hasSuffixFile(file, suffixesToScan) {
 			filteredFilesBySuffix = append(filteredFilesBySuffix, file)
 		}
 	}
@@ -33,8 +33,8 @@ func FilterFilesBySuffix(files, suffixesToScan []string) []string {
 	return filteredFilesBySuffix
 }
 
-func shouldSkipFolder(path string, foldersToSkip map[string]struct{}) bool {
-	paths := strings.Split(path, "/")
+func shouldSkipFolder(folder string, foldersToSkip map[string]struct{}) bool {
+	paths := strings.Split(folder, "/")
 	for _, folder := range paths {
 		if _, ok := foldersToSkip[folder]; ok {
 			return true
@@ -44,8 +44,8 @@ func shouldSkipFolder(path string, foldersToSkip map[string]struct{}) bool {
 	return false
 }
 
-func hasSuffix(path string, suffixesToScan []string) bool {
-	base := filepath.Base(path)
+func hasSuffixFile(file string, suffixesToScan []string) bool {
+	base := filepath.Base(file)
 	for _, suffix := range suffixesToScan {
 		if strings.HasSuffix(base, suffix) {
 			return true

@@ -2,27 +2,18 @@ package terminal
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 )
 
-func PrintLines(msg string, lines []string) {
+func PrintLines(msg, base string, lines []string) {
 	printMsg(msg)
 
 	for _, line := range lines {
-		fmt.Println(line)
+		fmt.Println(relativePath(base, line))
 	}
 
-	printSep()
-}
-
-func PrintFolders(msg string, folders []string) {
-	printMsg(msg)
-
-	for _, folder := range folders {
-		fmt.Println(folder)
-	}
-
-	fmt.Printf("\nTOTAL: %d\n", len(folders))
+	fmt.Printf("\nTOTAL: %d\n", len(lines))
 	printSep()
 }
 
@@ -31,13 +22,13 @@ func PrintCompare(msg, path1, path2 string, onlyIn1, onlyIn2 []string) {
 
 	printMsg(fmt.Sprintf("ONLY IN %s", path1))
 	for _, p := range onlyIn1 {
-		fmt.Println(p)
+		fmt.Println(relativePath(path1, p))
 	}
 	fmt.Printf("\nTOTAL: %d\n\n", len(onlyIn1))
 
 	printMsg(fmt.Sprintf("ONLY IN %s", path2))
 	for _, p := range onlyIn2 {
-		fmt.Println(p)
+		fmt.Println(relativePath(path2, p))
 	}
 	fmt.Printf("\nTOTAL: %d\n", len(onlyIn2))
 
@@ -58,4 +49,12 @@ func printMsg(msg string) {
 
 func printSep() {
 	fmt.Printf("\n%s\n\n", strings.Repeat("_", 100))
+}
+
+func relativePath(base, path string) string {
+	rel, err := filepath.Rel(base, path)
+	if err != nil {
+		return path
+	}
+	return filepath.ToSlash(rel)
 }
