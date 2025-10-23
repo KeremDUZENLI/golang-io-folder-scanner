@@ -60,7 +60,7 @@ func (c *Config) Run_4_ScanTree() {
 	folders := scanner.ListFolders(c.PathToScan)
 	foldersFiltered := scanner.FilterFolders(folders, foldersToSkipAll)
 	files := scanner.ListFiles(foldersFiltered)
-	treeItems := scanner.ScanTree(foldersFiltered, files, foldersTreeToSkipAll)
+	treeItems := scanner.CreateTree(foldersFiltered, files, foldersTreeToSkipAll)
 
 	terminal.PrintTree("ASCII TREE", c.PathToScan, treeItems)
 }
@@ -135,7 +135,7 @@ func (c *Config) Run_Tester(input string) {
 				println(i.Content)
 			}
 		case "4":
-			tree := scanner.ScanTree(foldersFiltered, filesFiltered, c.FoldersTreeToSkip)
+			tree := scanner.CreateTree(foldersFiltered, filesFiltered, c.FoldersTreeToSkip)
 			for _, i := range tree {
 				println(i.Path)
 				println(i.IsDir)
