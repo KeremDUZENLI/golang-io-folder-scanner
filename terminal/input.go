@@ -36,7 +36,7 @@ func InputKeypress() {
 func readLine(prompt, defaultVal string) string {
 	fmt.Printf("%s (default = %s): ", prompt, defaultVal)
 	input, err := reader.ReadString('\n')
-	PrintError("Failed to read input", err)
+	helper.PrintError(err)
 	return strings.TrimSpace(input)
 }
 

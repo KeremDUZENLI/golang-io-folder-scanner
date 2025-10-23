@@ -3,12 +3,15 @@ package scanner
 import (
 	"io/fs"
 	"path/filepath"
+
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/helper"
 )
 
 func FindFoldersEmpty(folders []string) []string {
 	foldersEmpty := []string{}
 	for _, folder := range folders {
-		hasFile, _ := walkFolderHas(folder, func(_ string) bool { return true })
+		hasFile, err := walkFolderHas(folder, func(_ string) bool { return true })
+		helper.PrintError(err)
 		if !hasFile {
 			foldersEmpty = append(foldersEmpty, folder)
 		}

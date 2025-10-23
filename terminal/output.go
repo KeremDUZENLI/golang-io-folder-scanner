@@ -65,12 +65,6 @@ func PrintCompare(msg, path1, path2 string, onlyIn1, onlyIn2 []string) {
 	printSep()
 }
 
-func PrintError(msg string, err error) {
-	if err != nil {
-		fmt.Printf("\n%s: %v\n", msg, err)
-	}
-}
-
 func printMsg(msg string) {
 	left := (100 - len(msg)) / 2
 	right := 100 - len(msg) - left

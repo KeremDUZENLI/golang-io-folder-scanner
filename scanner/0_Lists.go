@@ -19,15 +19,10 @@ func ListFolders(path string) []string {
 		folders = append(folders, dir)
 
 		fd, err := os.Open(dir)
-		if err != nil {
-			continue
-		}
-
+		helper.PrintError(err)
 		entries, err := fd.ReadDir(-1) // DO NOT sort; native order defines traversal & file order
+		helper.PrintError(err)
 		fd.Close()
-		if err != nil {
-			continue
-		}
 
 		childDirs := make([]string, 0, 8)
 		for _, e := range entries {
@@ -57,31 +52,27 @@ func ListFiles(folders []string) []string {
 	visited := make(map[string]struct{}, len(folders))
 
 	for _, folder := range folders {
-		_ = listAllowedFiles(folder, &files, allow, visited)
+		listAllowedFiles(folder, &files, allow, visited)
 	}
 
 	return files
 }
 
-func listAllowedFiles(folder string, files *[]string, allow map[string]struct{}, visited map[string]struct{}) error {
+func listAllowedFiles(folder string, files *[]string, allow map[string]struct{}, visited map[string]struct{}) {
 	if _, ok := allow[folder]; !ok {
-		return nil
+		return
 	}
 	if _, ok := visited[folder]; ok {
-		return nil
+		return
 	}
 	visited[folder] = struct{}{}
 
 	fd, err := os.Open(folder)
-	if err != nil {
-		return err
-	}
+	helper.PrintError(err)
 
 	entries, err := fd.ReadDir(-1) // DO NOT sort; native order defines traversal & file order
+	helper.PrintError(err)
 	fd.Close()
-	if err != nil {
-		return err
-	}
 
 	dirs := make([]string, 0, 8)
 	filesInThisDir := make([]string, 0, 16)
@@ -97,10 +88,8 @@ func listAllowedFiles(folder string, files *[]string, allow map[string]struct{},
 
 	// Recurse into subdirs in left-to-right native order; then emit this dir’s files
 	for i := 0; i < len(dirs); i++ {
-		_ = listAllowedFiles(dirs[i], files, allow, visited)
+		listAllowedFiles(dirs[i], files, allow, visited)
 	}
 
 	*files = append(*files, filesInThisDir...)
-
-	return nil
 }

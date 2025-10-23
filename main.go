@@ -5,11 +5,15 @@ import (
 	"os"
 
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/env"
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/helper"
 )
 
 func main() {
 	cfg := env.ConfigDefault
-	cfg.PathToScan, _ = os.Getwd()
+	pathCurrent, err := os.Getwd()
+	helper.PrintError(err)
+
+	cfg.PathToScan = pathCurrent
 
 	for {
 		var choice int

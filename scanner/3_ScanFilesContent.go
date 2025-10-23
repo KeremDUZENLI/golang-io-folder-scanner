@@ -2,6 +2,8 @@ package scanner
 
 import (
 	"os"
+
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/helper"
 )
 
 type Content struct {
@@ -14,9 +16,7 @@ func ScanFilesContent(files []string) []Content {
 
 	for _, file := range files {
 		bytes, err := os.ReadFile(file)
-		if err != nil {
-			continue
-		}
+		helper.PrintError(err)
 		contents = append(contents, Content{
 			Path:    file,
 			Content: string(bytes),
