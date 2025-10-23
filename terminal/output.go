@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/KeremDUZENLI/golang-io-folder-scanner/helper"
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/scanner"
 )
 
@@ -12,7 +13,7 @@ func PrintLines(msg, base string, lines []string) {
 	printMsg(msg)
 
 	for _, line := range lines {
-		fmt.Println(relativePath(base, line))
+		fmt.Println(helper.RelativePath(base, line))
 	}
 
 	fmt.Printf("\nTOTAL: %d\n", len(lines))
@@ -23,7 +24,7 @@ func PrintFilesContents(msg, base string, lines []scanner.Content) {
 	printMsg(msg)
 
 	for _, line := range lines {
-		fmt.Println(relativePath(base, line.Path) + "=")
+		fmt.Println(helper.RelativePath(base, line.Path) + "=")
 		fmt.Println(line.Content)
 		fmt.Println(strings.Repeat("-", 100))
 	}
@@ -40,7 +41,7 @@ func PrintTree(msg, base string, lines []scanner.TreeItem) {
 		if len(line.AncestorLast) > 0 && line.AncestorLast[len(line.AncestorLast)-1] {
 			branch = "└── "
 		}
-		path := filepath.Base(relativePath(base, line.Path))
+		path := filepath.Base(helper.RelativePath(base, line.Path))
 		fmt.Println(prefix + branch + path)
 	}
 
@@ -52,13 +53,13 @@ func PrintCompare(msg, path1, path2 string, onlyIn1, onlyIn2 []string) {
 
 	printMsg(fmt.Sprintf("ONLY IN %s", path1))
 	for _, p := range onlyIn1 {
-		fmt.Println(relativePath(path1, p))
+		fmt.Println(helper.RelativePath(path1, p))
 	}
 	fmt.Printf("\nTOTAL: %d\n\n", len(onlyIn1))
 
 	printMsg(fmt.Sprintf("ONLY IN %s", path2))
 	for _, p := range onlyIn2 {
-		fmt.Println(relativePath(path2, p))
+		fmt.Println(helper.RelativePath(path2, p))
 	}
 	fmt.Printf("\nTOTAL: %d\n", len(onlyIn2))
 
@@ -73,14 +74,6 @@ func printMsg(msg string) {
 
 func printSep() {
 	fmt.Printf("\n%s\n\n", strings.Repeat("_", 100))
-}
-
-func relativePath(base, path string) string {
-	rel, err := filepath.Rel(base, path)
-	if err != nil {
-		return path
-	}
-	return filepath.ToSlash(rel)
 }
 
 func buildGuides(ancestorLast []bool) string {

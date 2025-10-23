@@ -93,21 +93,21 @@ func (c *Config) Run_6_FindFoldersByFileSuffix() {
 }
 
 func (c *Config) Run_7_CompareFiles() {
-	path1 := terminal.InputPath("1.Path to scan", c.PathToScan)
-	path2 := terminal.InputPath("2.Path to scan", c.PathToScan)
+	base1 := terminal.InputPath("1.Path to scan", c.PathToScan)
+	base2 := terminal.InputPath("2.Path to scan", c.PathToScan)
 	folderToSkip := terminal.InputList("[ADD] Folders to skip", c.FoldersToSkip)
 
 	foldersToSkipAll := append(c.FoldersToSkip, folderToSkip...)
 
-	folders1 := scanner.ListFolders(path1)
-	folders2 := scanner.ListFolders(path2)
+	folders1 := scanner.ListFolders(base1)
+	folders2 := scanner.ListFolders(base2)
 	foldersFiltered1 := scanner.FilterFolders(folders1, foldersToSkipAll)
 	foldersFiltered2 := scanner.FilterFolders(folders2, foldersToSkipAll)
 	filesFiltered1 := scanner.ListFiles(foldersFiltered1)
 	filesFiltered2 := scanner.ListFiles(foldersFiltered2)
-	onlyIn1, onlyIn2 := scanner.CompareFiles(filesFiltered1, filesFiltered2)
+	onlyIn1, onlyIn2 := scanner.CompareFiles(base1, base2, filesFiltered1, filesFiltered2)
 
-	terminal.PrintCompare("FILE COMPARISON", path1, path2, onlyIn1, onlyIn2)
+	terminal.PrintCompare("FILE COMPARISON", base1, base2, onlyIn1, onlyIn2)
 }
 
 func (c *Config) Run_Tester(input string) {

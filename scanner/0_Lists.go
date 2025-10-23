@@ -7,11 +7,11 @@ import (
 	"github.com/KeremDUZENLI/golang-io-folder-scanner/helper"
 )
 
-func ListFolders(path string) []string {
-	path = helper.CanonicalPath(path)
+func ListFolders(base string) []string {
+	base = helper.CanonicalPath(base)
 
 	folders := make([]string, 0, 64)
-	stack := []string{path}
+	stack := []string{base}
 
 	for len(stack) > 0 {
 		dir := stack[len(stack)-1]

@@ -6,10 +6,18 @@ import (
 	"path/filepath"
 )
 
-func CanonicalPath(path string) string {
-	pathAbs, _ := filepath.Abs(path)
+func CanonicalPath(base string) string {
+	pathAbs, _ := filepath.Abs(base)
 	clean := filepath.Clean(pathAbs)
 	return filepath.ToSlash(clean)
+}
+
+func RelativePath(base, path string) string {
+	rel, err := filepath.Rel(base, path)
+	if err != nil {
+		return path
+	}
+	return filepath.ToSlash(rel)
 }
 
 func PrintError(err error) {
