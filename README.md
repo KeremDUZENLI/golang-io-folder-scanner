@@ -17,11 +17,11 @@ A fast CLI to scan directories, read file contents, print ASCII trees, find file
 
 You can download precompiled executables from the [Releases](https://github.com/KeremDUZENLI/golang-io-folder-scanner/releases/latest) page.
 
-| Platform    | File                                                                                                                             | SHA256                                                             |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| **Linux**   | [IOScanner_Linux](https://github.com/KeremDUZENLI/golang-io-folder-scanner/releases/latest/download/IOScanner_Linux)             | `9ca6624dbe6c88cba7f98bca6b01c608cae7dbfaecdd3b6329756502ae9766d1` |
-| **macOS**   | [IOScanner_MacOS](https://github.com/KeremDUZENLI/golang-io-folder-scanner/releases/latest/download/IOScanner_MacOS)             | `476d48a8fbda7fe4fb350cbc905937769ecdd8313ad788be9fab7d831d1da08f` |
-| **Windows** | [IOScanner_Windows.exe](https://github.com/KeremDUZENLI/golang-io-folder-scanner/releases/latest/download/IOScanner_Windows.exe) | `0ad45fc50910a279c9f9d58a1aec66b1f205a7739bd239906220755a04eb66f6` |
+| Platform    | File                                                                                                                         |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Linux**   | [IOScanner_Linux](https://github.com/KeremDUZENLI/golang-io-folder-scanner/releases/latest/download/IOScanner_Linux)         |
+| **macOS**   | [IOScanner_MacOS](https://github.com/KeremDUZENLI/golang-io-folder-scanner/releases/latest/download/IOScanner_MacOS)         |
+| **Windows** | [IOScanner_Windows](https://github.com/KeremDUZENLI/golang-io-folder-scanner/releases/latest/download/IOScanner_Windows.exe) |
 
 ## Menu
 
