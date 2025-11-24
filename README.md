@@ -23,6 +23,28 @@ You can download precompiled executables from the [Releases](https://github.com/
 | **macOS**   | [IOScanner_MacOS](https://github.com/KeremDUZENLI/golang-io-folder-scanner/releases/latest/download/IOScanner_MacOS)         |
 | **Windows** | [IOScanner_Windows](https://github.com/KeremDUZENLI/golang-io-folder-scanner/releases/latest/download/IOScanner_Windows.exe) |
 
+
+## Graphical Desktop App (GUI)
+
+Build the GUI Yourself
+
+Install the Fyne tool:
+
+go install fyne.io/tools/cmd/fyne@latest
+
+Run the GUI locally
+
+cd cmd/gui
+go run .
+
+Build a desktop app
+
+fyne package -os darwin    # macOS
+fyne package -os windows   # Windows
+fyne package -os linux     # Linux
+
+The compiled .app, .exe, or binary will appear inside cmd/gui/.
+
 ## Menu
 
 ```
