@@ -23,7 +23,6 @@ You can download precompiled executables from the [Releases](https://github.com/
 | **macOS**   | [IOScanner_MacOS](https://github.com/KeremDUZENLI/golang-io-folder-scanner/releases/latest/download/IOScanner_MacOS)         |
 | **Windows** | [IOScanner_Windows](https://github.com/KeremDUZENLI/golang-io-folder-scanner/releases/latest/download/IOScanner_Windows.exe) |
 
-
 ## Graphical Desktop App (GUI)
 
 Build the GUI Yourself
@@ -39,9 +38,9 @@ go run .
 
 Build a desktop app
 
-fyne package -os darwin    # macOS
-fyne package -os windows   # Windows
-fyne package -os linux     # Linux
+fyne package -os darwin # macOS
+fyne package -os windows # Windows
+fyne package -os linux # Linux
 
 The compiled .app, .exe, or binary will appear inside cmd/gui/.
 
@@ -81,7 +80,7 @@ env/config.go=
 package env
 ...
 
--------------------------------------------------------------------------------
+---------------------------------------------------------------------
 env/setup.go=
 package env
 ...
