@@ -22,7 +22,7 @@ func FilterFolders(folders, foldersToSkip []string) []string {
 func shouldSkipFolder(folder string, foldersToSkip map[string]struct{}) bool {
 	paths := strings.Split(folder, "/")
 	for _, folder := range paths {
-		if _, ok := foldersToSkip[folder]; ok {
+		if _, ok := foldersToSkip[strings.ToLower(folder)]; ok {
 			return true
 		}
 	}

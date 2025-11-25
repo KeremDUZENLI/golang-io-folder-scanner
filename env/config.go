@@ -21,7 +21,8 @@ var ConfigDefault = Config{
 		".git", ".gitignore",
 		".env", ".venv", ".vscode",
 		".idea", ".out",
-		"dist", "build", "bin", "vendor", "target",
+		"dist", "build", "bin",
+		"vendor", "target", "myEnv",
 	},
 
 	FoldersTreeToSkip: []string{
