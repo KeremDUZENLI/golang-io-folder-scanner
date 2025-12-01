@@ -17,7 +17,7 @@ var ConfigDefault = Config{
 	},
 
 	FoldersToSkip: []string{
-		"__pycache__", "node_modules",
+		"__pycache__", ".ipynb_checkpoints", "node_modules",
 		".git", ".gitignore",
 		".env", ".venv", ".vscode",
 		".idea", ".out",
