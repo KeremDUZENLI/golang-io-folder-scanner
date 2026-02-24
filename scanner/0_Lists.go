@@ -24,6 +24,8 @@ func ListFolders(base string) []string {
 		helper.PrintError(err)
 		fd.Close()
 
+		helper.SortEntries(entries)
+
 		childDirs := make([]string, 0, 8)
 		for _, e := range entries {
 			if e.IsDir() {
@@ -73,6 +75,8 @@ func listAllowedFiles(folder string, files *[]string, allow map[string]struct{},
 	entries, err := fd.ReadDir(-1) // DO NOT sort; native order defines traversal & file order
 	helper.PrintError(err)
 	fd.Close()
+
+	helper.SortEntries(entries)
 
 	dirs := make([]string, 0, 8)
 	filesInThisDir := make([]string, 0, 16)
